@@ -19,7 +19,9 @@
     "synthesisAtSearches": 180,
     "maxNewItems": 10,
     "maxVideoContexts": 8,
-    "maxTranscriptCharsPerVideo": 12000,
+    "maxEvidenceCharsPerSearch": 1800,
+    "maxTranscriptCharsPerVideo": 2500,
+    "maxPromptBytes": 110000,
     "maxCny": 10,
     "maxWallMinutes": 60,
     "maxChangedFiles": 3
@@ -33,7 +35,6 @@
     "output": 9
   },
   "paths": {
-    "draft": ".automation/draft.json",
     "report": ".automation/report.json",
     "entries": "content/entries/automated",
     "state": "content/state.json",

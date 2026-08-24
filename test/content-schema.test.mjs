@@ -4,6 +4,7 @@ import test from 'node:test';
 import { canonicalizeUrl, toSiteItem, validateDraft, validateSiteItem } from '../scripts/content-schema.mjs';
 import { estimateCny, readDshTelemetry } from '../scripts/content-budget.mjs';
 import { videoContextInternals } from '../scripts/video-context.mjs';
+import { classifyDshFailure, extractDshFailureCode, parseDshDraftOutput } from '../scripts/dsh-result.mjs';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -100,4 +101,17 @@ test('video context discovers Bilibili and YouTube references without duplicates
 
 test('video context reads Bilibili subtitle bodies', () => {
   assert.equal(videoContextInternals.subtitleText({ body: [{ content: '第一句' }, { content: '第二句' }] }), '第一句\n第二句');
+});
+
+test('DSH headless final JSON is parsed without granting file writes', () => {
+  const draft = parseDshDraftOutput('{"schema":1,"runDate":"2026-08-24","items":[]}');
+  assert.deepEqual(draft, { schema: 1, runDate: '2026-08-24', items: [] });
+  assert.throws(() => parseDshDraftOutput('finished\n{"schema":1,"items":[]}'), /JSON only/);
+});
+
+test('DSH headless provider failure codes are sanitized and classified', () => {
+  const stderr = 'dsh: LLM_STREAM_IDLE_TIMEOUT: upstream stopped sending chunks';
+  assert.equal(extractDshFailureCode('', stderr), 'LLM_STREAM_IDLE_TIMEOUT');
+  assert.equal(classifyDshFailure('', stderr), 'MODEL_TIMEOUT');
+  assert.equal(classifyDshFailure('', 'dsh: SOME_PROVIDER_ERROR: detail'), 'DSH_PROVIDER_FAILED');
 });
