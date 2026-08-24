@@ -1,1 +1,227 @@
-[]
+[
+  {
+    "id": "auto-3c61980dc4c6c1",
+    "type": "analysis",
+    "date": "2026.08.21",
+    "time": "18:44",
+    "source": "游戏矩阵",
+    "platform": "文章",
+    "platformEn": "ARTICLE",
+    "title": "逐帧翻看《黑神话：钟馗》之后：细节，细节，还是细节！",
+    "titleEn": "Frame-by-Frame Analysis of Black Myth: Zhong Kui: Details, Details, Details!",
+    "summary": "游戏矩阵对15分钟实机演示的逐帧分析，涵盖画面技术、光照效果、战斗动作、电影化镜头语言，并引用杨奇微博关于阴天氛围和叙事演出的评论。",
+    "summaryEn": "Frame-by-frame analysis of the 15-minute gameplay trailer, covering visual tech, lighting, combat moves, cinematic language, and quoting Yang Qi's Weibo comments on overcast atmosphere and narrative presentation.",
+    "audience": [
+      "zh"
+    ],
+    "evidence": "analysis",
+    "duration": "文章",
+    "durationEn": "Article",
+    "image": "/assets/media/official-2026.jpg",
+    "tags": [
+      "逐帧分析",
+      "细节",
+      "杨奇",
+      "战斗",
+      "画面"
+    ],
+    "tagsEn": [
+      "frame-by-frame",
+      "details",
+      "Yang Qi",
+      "combat",
+      "visuals"
+    ],
+    "links": [
+      {
+        "label": "阅读原文",
+        "labelEn": "Read source",
+        "url": "https://www.163.com/dy/article/L4RM9T7405268CC2.html"
+      }
+    ],
+    "provenance": {
+      "canonicalUrl": "https://www.163.com/dy/article/L4RM9T7405268CC2.html",
+      "originalTitle": "逐帧翻看《黑神话：钟馗》之后：细节，细节，还是细节！",
+      "publishedAt": "2026-08-21T10:44:22.000Z",
+      "collectedAt": "2026-08-24T17:05:33.330Z",
+      "valueScore": 85,
+      "evidence": [
+        {
+          "url": "https://www.163.com/dy/article/L4RM9T7405268CC2.html",
+          "type": "secondary",
+          "supports": "提供对15分钟实机的详细分析，引用杨奇微博。",
+          "supportsEn": "Provides detailed analysis of the 15-minute trailer, quoting Yang Qi's Weibo."
+        }
+      ]
+    }
+  },
+  {
+    "id": "auto-852241fe5f962e",
+    "type": "research",
+    "date": "2026.07.11",
+    "time": "08:00",
+    "source": "blackmyth.game Editorial Desk",
+    "platform": "文章",
+    "platformEn": "ARTICLE",
+    "title": "处容与钟馗：两种守护面孔",
+    "titleEn": "Cheoyong and Zhong Kui: Two Warding Faces",
+    "summary": "文章比较韩国处容与中国钟馗的驱邪形象，探讨跨文化民俗中的守护者角色。",
+    "summaryEn": "Article compares Korean Cheoyong and Chinese Zhong Kui as warding figures, exploring cross-cultural folklore protectors.",
+    "audience": [
+      "en"
+    ],
+    "evidence": "analysis",
+    "duration": "文章",
+    "durationEn": "Article",
+    "image": "/assets/media/official-2026.jpg",
+    "tags": [
+      "处容",
+      "钟馗",
+      "民俗",
+      "跨文化",
+      "驱邪"
+    ],
+    "tagsEn": [
+      "Cheoyong",
+      "Zhong Kui",
+      "folklore",
+      "cross-cultural",
+      "warding"
+    ],
+    "links": [
+      {
+        "label": "阅读原文",
+        "labelEn": "Read source",
+        "url": "https://blackmyth.game/en/posts/lore/zhong-kui-korea-cheoyong/"
+      }
+    ],
+    "provenance": {
+      "canonicalUrl": "https://blackmyth.game/en/posts/lore/zhong-kui-korea-cheoyong/",
+      "originalTitle": "Cheoyong and Zhong Kui: Two Warding Faces",
+      "publishedAt": "2026-07-11T00:00:00.000Z",
+      "collectedAt": "2026-08-24T17:05:33.330Z",
+      "valueScore": 70,
+      "evidence": [
+        {
+          "url": "https://blackmyth.game/en/posts/lore/zhong-kui-korea-cheoyong/",
+          "type": "secondary",
+          "supports": "提供处容与钟馗的跨文化比较。",
+          "supportsEn": "Provides cross-cultural comparison of Cheoyong and Zhong Kui."
+        }
+      ]
+    }
+  },
+  {
+    "id": "auto-62094aaba81ab3",
+    "type": "research",
+    "date": "2026.06.11",
+    "time": "08:00",
+    "source": "blackmyth.game Editorial Desk",
+    "platform": "文章",
+    "platformEn": "ARTICLE",
+    "title": "钟馗是谁？《黑神话》主角的神话原型",
+    "titleEn": "Who is Zhong Kui? The Mythological Prototype of Black Myth's Protagonist",
+    "summary": "文章梳理钟馗在神话和民俗中的形象，强调其驱鬼、护界、审断的功能，并区分神话原型与游戏设定。",
+    "summaryEn": "Article outlines Zhong Kui's mythological and folk image, emphasizing his functions as ghost hunter, threshold protector, and judge, distinguishing myth from game lore.",
+    "audience": [
+      "zh",
+      "en"
+    ],
+    "evidence": "analysis",
+    "duration": "文章",
+    "durationEn": "Article",
+    "image": "/assets/media/official-2026.jpg",
+    "tags": [
+      "钟馗",
+      "神话原型",
+      "民俗",
+      "驱鬼",
+      "考据"
+    ],
+    "tagsEn": [
+      "Zhong Kui",
+      "mythology",
+      "folklore",
+      "ghost hunter",
+      "research"
+    ],
+    "links": [
+      {
+        "label": "阅读原文",
+        "labelEn": "Read source",
+        "url": "https://blackmyth.game/zh-cn/posts/lore/who-is-zhong-kui/"
+      }
+    ],
+    "provenance": {
+      "canonicalUrl": "https://blackmyth.game/zh-cn/posts/lore/who-is-zhong-kui/",
+      "originalTitle": "钟馗是谁?《黑神话》主角的神话原型",
+      "publishedAt": "2026-06-11T00:00:00.000Z",
+      "collectedAt": "2026-08-24T17:05:33.330Z",
+      "valueScore": 80,
+      "evidence": [
+        {
+          "url": "https://blackmyth.game/zh-cn/posts/lore/who-is-zhong-kui/",
+          "type": "secondary",
+          "supports": "提供钟馗神话原型的详细考据。",
+          "supportsEn": "Provides detailed research on Zhong Kui's mythological prototype."
+        }
+      ]
+    }
+  },
+  {
+    "id": "auto-06a84c235649b9",
+    "type": "official",
+    "date": "2026.02.10",
+    "time": "10:00",
+    "source": "黑神话",
+    "platform": "BILIBILI",
+    "platformEn": "BILIBILI",
+    "title": "游戏科学拜个早年，《黑神话：钟馗》6分钟实机小短片",
+    "titleEn": "Game Science's New Year Greeting: 6-Minute Gameplay Short",
+    "summary": "游戏科学官方B站账号发布的6分钟实机小短片，为马年春节录制，与游戏实际剧情无关。",
+    "summaryEn": "Official 6-minute gameplay short from Game Science's Bilibili account, made for the Year of the Horse, not representative of actual story.",
+    "audience": [
+      "zh"
+    ],
+    "evidence": "confirmed",
+    "duration": "6分钟",
+    "durationEn": "6 minutes",
+    "image": "/assets/media/official-2026.jpg",
+    "tags": [
+      "官方",
+      "实机",
+      "春节",
+      "马年",
+      "游戏科学"
+    ],
+    "tagsEn": [
+      "official",
+      "gameplay",
+      "Spring Festival",
+      "Year of the Horse",
+      "Game Science"
+    ],
+    "links": [
+      {
+        "label": "查看原视频",
+        "labelEn": "Watch source",
+        "url": "https://www.bilibili.com/video/BV11PcgzWEJp/"
+      }
+    ],
+    "provenance": {
+      "canonicalUrl": "https://www.bilibili.com/video/BV11PcgzWEJp/",
+      "originalTitle": "游戏科学拜个早年，《黑神话：钟馗》6分钟实机小短片",
+      "publishedAt": "2026-02-10T02:00:00.000Z",
+      "collectedAt": "2026-08-24T17:05:33.330Z",
+      "valueScore": 90,
+      "evidence": [
+        {
+          "url": "https://www.bilibili.com/video/BV11PcgzWEJp/",
+          "type": "official",
+          "supports": "官方B站账号发布的6分钟实机小短片。",
+          "supportsEn": "Official Bilibili account's 6-minute gameplay short."
+        }
+      ]
+    }
+  }
+]

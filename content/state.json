@@ -1,15 +1,16 @@
 {
   "schema": 1,
-  "lastInputFingerprint": "d2088f72720f7c97ad41e0dad3c151a75070f94e12d64592c0a90b228c7e0547",
-  "lastStatus": "BLOCKED",
+  "lastInputFingerprint": "8e66795dae6d895131faef2670c429cb1276121bb6f936c0fbe5e460b42db988",
+  "lastStatus": "PASS",
   "lastRunDate": "2026-08-25",
-  "blocker": {
-    "code": "MODEL_REQUEST_REJECTED",
-    "message": "NVIDIA 模型服务拒绝了请求，未发布本轮内容。"
-  },
+  "blocker": null,
   "seenUrls": [
+    "https://blackmyth.game/en/posts/lore/zhong-kui-korea-cheoyong/",
     "https://blackmyth.game/ja/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/",
+    "https://blackmyth.game/zh-cn/posts/lore/who-is-zhong-kui/",
     "https://gamesci.cn/zhongkui/",
+    "https://www.163.com/dy/article/L4RM9T7405268CC2.html",
+    "https://www.bilibili.com/video/BV11PcgzWEJp/",
     "https://www.bilibili.com/video/BV1Ew8P6pEUE/",
     "https://www.bilibili.com/video/BV1Ns8w6fE4k/",
     "https://www.bilibili.com/video/BV1eh8q6rEWN/",
