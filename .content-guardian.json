@@ -18,8 +18,8 @@
     "maxSearches": 200,
     "synthesisAtSearches": 180,
     "maxNewItems": 10,
-    "maxVideoContexts": 12,
-    "maxTranscriptCharsPerVideo": 24000,
+    "maxVideoContexts": 8,
+    "maxTranscriptCharsPerVideo": 12000,
     "maxCny": 10,
     "maxWallMinutes": 60,
     "maxChangedFiles": 3
