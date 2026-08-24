@@ -32,7 +32,7 @@ export function normalizeNimUsage(usage) {
   };
 }
 
-export function parseNimCompletion(payload) {
+export function parseNimCompletion(payload, options = {}) {
   const choice = payload?.choices?.[0];
   if (!choice || typeof choice !== 'object') {
     throw Object.assign(new Error('NVIDIA NIM response did not contain a completion choice'), { code: 'MODEL_PROTOCOL_FAILED' });
@@ -52,7 +52,10 @@ export function parseNimCompletion(payload) {
   if (!output.trim()) {
     throw Object.assign(new Error('NVIDIA NIM returned no final text'), { code: 'MODEL_EMPTY_RESPONSE' });
   }
-  return { output, usage: normalizeNimUsage(payload.usage) };
+  const usage = payload.usage
+    ? normalizeNimUsage(payload.usage)
+    : options.allowMissingUsage ? null : normalizeNimUsage(payload.usage);
+  return { output, usage };
 }
 
 export function parseNimStream(text) {

@@ -136,6 +136,16 @@ test('NVIDIA streaming chunks are assembled with final usage', () => {
   assert.equal(completion.usage.totalTokens, 16);
 });
 
+test('NVIDIA default stream can omit usage and use the configured budget bound', () => {
+  const payload = parseNimStream([
+    'data: {"choices":[{"delta":{"content":"{}"},"finish_reason":"stop"}]}',
+    'data: [DONE]',
+  ].join('\n'));
+  const completion = parseNimCompletion(payload, { allowMissingUsage: true });
+  assert.equal(completion.output, '{}');
+  assert.equal(completion.usage, null);
+});
+
 test('video audience policy keeps primary platforms at two-to-one while allowing crossover', () => {
   const bilibili = [
     validItem({ canonicalUrl: 'https://www.bilibili.com/video/BV1abc/', sourceName: 'B站作者甲', platform: 'BILIBILI', audience: ['zh', 'en'], valueScore: 91 }),

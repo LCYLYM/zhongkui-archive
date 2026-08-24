@@ -118,7 +118,7 @@ function flattenExternalText(value, output = []) {
   return output;
 }
 
-async function readLimitedText(response, maxBytes = 2_000_000) {
+async function readLimitedText(response, maxBytes = 2_000_000, errorCode = 'EXA_SEARCH_FAILED') {
   const reader = response.body?.getReader();
   if (!reader) return '';
   const chunks = [];
@@ -129,7 +129,7 @@ async function readLimitedText(response, maxBytes = 2_000_000) {
     bytes += value.byteLength;
     if (bytes > maxBytes) {
       await reader.cancel();
-      throw new GuardianError('EXA_SEARCH_FAILED', 'Exa returned an unexpectedly large response');
+      throw new GuardianError(errorCode, 'upstream returned an unexpectedly large response');
     }
     chunks.push(value);
   }
@@ -222,12 +222,32 @@ async function runNvidiaModel({ config, prompt, credential, searches, startedAt,
   const modelDeadline = Math.min(deadline, Date.now() + config.limits.maxModelMinutes * 60_000);
   const timer = setTimeout(() => controller.abort(), Math.max(1, modelDeadline - Date.now()));
   let responseText = '';
+  const promptBytes = Buffer.byteLength(prompt, 'utf8');
+  const boundedUsage = {
+    inputTokens: Math.min(promptBytes, config.model.contextWindow - config.model.maxTokens),
+    outputTokens: config.model.maxTokens,
+    cacheReadTokens: 0,
+    cacheWriteTokens: 0,
+    reasoningTokens: 0,
+  };
+  const boundedCny = estimateCny(boundedUsage, config.pricing);
+  const baseEvidence = {
+    provider: config.model.provider,
+    model: config.model.id,
+    searches,
+    usage: null,
+    estimatedCny: boundedCny,
+    costBasis: 'configured-upper-bound',
+  };
+  if (boundedCny > config.limits.maxCny) {
+    throw Object.assign(new GuardianError('BUDGET_EXHAUSTED', 'configured request upper bound exceeds the budget'), { evidence: baseEvidence });
+  }
   try {
     const response = await fetch(`${config.model.baseUrl.replace(/\/$/, '')}/chat/completions`, {
       method: 'POST',
       headers: {
         authorization: `Bearer ${credential}`,
-        accept: 'application/json',
+        accept: config.model.stream ? 'text/event-stream' : 'application/json',
         'content-type': 'application/json',
       },
       body: JSON.stringify({
@@ -240,30 +260,37 @@ async function runNvidiaModel({ config, prompt, credential, searches, startedAt,
         top_p: config.model.topP,
         max_tokens: config.model.maxTokens,
         stream: config.model.stream,
-        stream_options: config.model.stream ? { include_usage: true } : undefined,
       }),
       signal: controller.signal,
     });
-    responseText = await readLimitedText(response);
+    responseText = await readLimitedText(response, 2_000_000, 'MODEL_PROTOCOL_FAILED');
     if (!response.ok) {
-      throw new GuardianError(classifyNimHttpStatus(response.status), `NVIDIA NIM rejected the request with HTTP ${response.status}`);
+      throw Object.assign(
+        new GuardianError(classifyNimHttpStatus(response.status), `NVIDIA NIM rejected the request with HTTP ${response.status}`),
+        { evidence: {
+          ...baseEvidence,
+          httpStatus: response.status,
+          durationMs: Date.now() - startedAt,
+          responseBytes: Buffer.byteLength(responseText, 'utf8'),
+          responseSha256: sha256(responseText),
+        } },
+      );
     }
     let payload;
     try { payload = config.model.stream ? parseNimStream(responseText) : JSON.parse(responseText); }
     catch { throw new GuardianError('MODEL_PROTOCOL_FAILED', 'NVIDIA NIM returned invalid JSON'); }
     let completion;
-    try { completion = parseNimCompletion(payload); }
+    try { completion = parseNimCompletion(payload, { allowMissingUsage: config.model.stream }); }
     catch (error) { throw new GuardianError(error.code ?? 'MODEL_PROTOCOL_FAILED', error.message); }
-    const estimatedCny = estimateCny(completion.usage, config.pricing);
+    const estimatedCny = completion.usage ? estimateCny(completion.usage, config.pricing) : boundedCny;
     const evidence = {
-      provider: config.model.provider,
-      model: config.model.id,
+      ...baseEvidence,
       durationMs: Date.now() - startedAt,
       responseBytes: Buffer.byteLength(responseText, 'utf8'),
       responseSha256: sha256(responseText),
-      searches,
       usage: completion.usage,
       estimatedCny,
+      costBasis: completion.usage ? 'reported-usage' : 'configured-upper-bound',
     };
     if (searches < config.limits.minSearches) {
       throw Object.assign(new GuardianError('INSUFFICIENT_SEARCH_COVERAGE', `search calls were below ${config.limits.minSearches}`), { evidence });
@@ -445,6 +472,8 @@ const report = {
     durationMs: evidence.durationMs,
     responseBytes: evidence.responseBytes,
     responseSha256: evidence.responseSha256,
+    httpStatus: evidence.httpStatus,
+    costBasis: evidence.costBasis,
     discardedItems: evidence.discardedItems,
     discardedCreatorDuplicates: evidence.discardedCreatorDuplicates,
     trimmedCrossAudience: evidence.trimmedCrossAudience,
