@@ -6,7 +6,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { estimateCny, readDshTelemetry } from './content-budget.mjs';
-import { canonicalizeUrl, toSiteItem, validateDraft } from './content-schema.mjs';
+import { canonicalizeUrl, toSiteItem, validateDraftCandidates } from './content-schema.mjs';
 import { classifyDshFailure, extractDshFailureCode, parseDshDraftOutput } from './dsh-result.mjs';
 import { collectVideoContexts } from './video-context.mjs';
 
@@ -53,16 +53,25 @@ function overlay(config, sessionsRoot) {
         apiKeyEnv: NVIDIA_API_KEY
         api: openai-completions
         baseURL: ${JSON.stringify(config.dsh.baseUrl)}
+        headers:
+          NVCF-POLL-SECONDS: "3600"
         compat:
           supportsDeveloperRole: false
           maxTokensField: max_tokens
+          thinkingFormat: chat-template
+          chatTemplateKwargs:
+            enable_thinking: false
         models:
           - id: ${JSON.stringify(config.dsh.model)}
             name: MiniMax M3
             contextWindow: ${config.dsh.contextWindow}
             maxTokens: ${config.dsh.maxTokens}
+            reasoningEfforts:
+              off:
+              high: high
         defaultContextWindow: ${config.dsh.contextWindow}
         defaultMaxTokens: ${config.dsh.maxTokens}
+        reasoning: off
         retryPolicy:
           mode: normal
           maxRetries: 1
@@ -403,7 +412,8 @@ function publicBlocker(error) {
     DSH_RUN_FAILED: 'DSH 本轮运行失败，未发布内容。',
     DSH_CHANGED_REPOSITORY: 'DSH 越过临时草稿边界修改了仓库，补丁已拒绝。',
     RESEARCH_BUNDLE_TOO_LARGE: '压缩后的搜索证据仍超过任务载荷上限，未调用模型。',
-    DRAFT_INVALID: 'DSH 草稿未通过数据与来源校验。',
+    DRAFT_OUTPUT_INVALID: 'DSH 最终回答不是可解析的 JSON，未发布本轮内容。',
+    DRAFT_SCHEMA_INVALID: 'DSH 草稿结构或候选未通过数据与来源校验。',
   };
   return { code, message: safeMessages[code] ?? '本轮内容更新被验证器拒绝。' };
 }
@@ -469,11 +479,18 @@ try {
     if (gitStatus() !== '') throw new GuardianError('DSH_CHANGED_REPOSITORY', 'DSH changed tracked or publishable files directly');
     let rawDraft;
     try { rawDraft = parseDshDraftOutput(dshResult.output); }
-    catch (error) { throw Object.assign(new GuardianError('DRAFT_INVALID', error.message), { evidence }); }
+    catch (error) { throw Object.assign(new GuardianError('DRAFT_OUTPUT_INVALID', error.message), { evidence }); }
     let draft;
-    try { draft = validateDraft(rawDraft, { maxItems: config.limits.maxNewItems }); }
-    catch (error) { throw new GuardianError('DRAFT_INVALID', error.message); }
-    if (draft.runDate !== runDate) throw new GuardianError('DRAFT_INVALID', 'draft runDate does not match this run');
+    try {
+      const result = validateDraftCandidates(rawDraft, { maxItems: config.limits.maxNewItems });
+      draft = result.draft;
+      evidence.discardedItems = result.discardedItems;
+    } catch (error) {
+      throw Object.assign(new GuardianError('DRAFT_SCHEMA_INVALID', error.message), { evidence });
+    }
+    if (draft.runDate !== runDate) {
+      throw Object.assign(new GuardianError('DRAFT_SCHEMA_INVALID', 'draft runDate does not match this run'), { evidence });
+    }
     const seen = new Set(state.seenUrls.map(url => canonicalizeUrl(url)));
     const publishable = draft.items
       .filter(item => item.reviewFlags.length === 0 && item.evidenceLevel !== 'speculation')
@@ -532,6 +549,7 @@ const report = {
     stdoutSha256: evidence.stdoutSha256,
     stderrSha256: evidence.stderrSha256,
     dshFailureCode: evidence.dshFailureCode,
+    discardedItems: evidence.discardedItems,
     researchSha256: evidence.researchSha256,
     searches: evidence.searches,
     usage: evidence.usage,

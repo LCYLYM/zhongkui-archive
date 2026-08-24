@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { canonicalizeUrl, toSiteItem, validateDraft, validateSiteItem } from '../scripts/content-schema.mjs';
+import { canonicalizeUrl, toSiteItem, validateDraft, validateDraftCandidates, validateSiteItem } from '../scripts/content-schema.mjs';
 import { estimateCny, readDshTelemetry } from '../scripts/content-budget.mjs';
 import { videoContextInternals } from '../scripts/video-context.mjs';
 import { classifyDshFailure, extractDshFailureCode, parseDshDraftOutput } from '../scripts/dsh-result.mjs';
@@ -106,7 +106,17 @@ test('video context reads Bilibili subtitle bodies', () => {
 test('DSH headless final JSON is parsed without granting file writes', () => {
   const draft = parseDshDraftOutput('{"schema":1,"runDate":"2026-08-24","items":[]}');
   assert.deepEqual(draft, { schema: 1, runDate: '2026-08-24', items: [] });
-  assert.throws(() => parseDshDraftOutput('finished\n{"schema":1,"items":[]}'), /JSON only/);
+  assert.deepEqual(parseDshDraftOutput('整理结果如下：\n{"schema":1,"items":[]}'), { schema: 1, items: [] });
+});
+
+test('one invalid model candidate does not discard valid entries', () => {
+  const result = validateDraftCandidates({
+    schema: 1,
+    runDate: '2026-08-24',
+    items: [validItem(), { ...validItem(), canonicalUrl: 'not-a-url' }],
+  }, { maxItems: 10, now: new Date('2026-08-24T12:00:00Z') });
+  assert.equal(result.draft.items.length, 1);
+  assert.equal(result.discardedItems, 1);
 });
 
 test('DSH headless provider failure codes are sanitized and classified', () => {

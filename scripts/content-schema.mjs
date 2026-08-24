@@ -181,6 +181,33 @@ export function validateDraft(draft, options = {}) {
   return { schema: 1, runDate: draft.runDate, items };
 }
 
+export function validateDraftCandidates(draft, options = {}) {
+  if (!plainObject(draft)) fail('draft', 'must be an object');
+  const maxItems = options.maxItems ?? 10;
+  if (!Array.isArray(draft.items) || draft.items.length > maxItems) {
+    fail('draft.items', `must contain at most ${maxItems} items`);
+  }
+  validateDraft({ ...draft, items: [] }, options);
+  const items = [];
+  const seen = new Set();
+  let discardedItems = 0;
+  for (const candidate of draft.items) {
+    try {
+      const item = validateDraft({ schema: draft.schema, runDate: draft.runDate, items: [candidate] }, options).items[0];
+      if (seen.has(item.canonicalUrl)) {
+        discardedItems += 1;
+        continue;
+      }
+      seen.add(item.canonicalUrl);
+      items.push(item);
+    } catch {
+      discardedItems += 1;
+    }
+  }
+  if (draft.items.length > 0 && items.length === 0) fail('draft.items', 'no candidate passed validation');
+  return { draft: { schema: 1, runDate: draft.runDate, items }, discardedItems };
+}
+
 function chinaParts(isoDate) {
   return Object.fromEntries(new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',

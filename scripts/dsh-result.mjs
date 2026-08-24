@@ -4,9 +4,12 @@ export function parseDshDraftOutput(stdout, maxChars = 128_000) {
   const trimmed = String(stdout ?? '').trim();
   if (!trimmed || trimmed.length > maxChars) throw new Error('DSH final answer is missing or too large');
   const fenced = trimmed.match(/^```(?:json)?\s*\r?\n([\s\S]*?)\r?\n```$/i);
-  const payload = (fenced?.[1] ?? trimmed).trim();
+  let payload = (fenced?.[1] ?? trimmed).trim();
   if (!payload.startsWith('{') || !payload.endsWith('}')) {
-    throw new Error('DSH final answer must contain JSON only');
+    const start = payload.indexOf('{');
+    const end = payload.lastIndexOf('}');
+    if (start < 0 || end <= start) throw new Error('DSH final answer does not contain a JSON object');
+    payload = payload.slice(start, end + 1);
   }
   return JSON.parse(payload);
 }

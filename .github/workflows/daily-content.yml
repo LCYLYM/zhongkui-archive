@@ -55,7 +55,7 @@ jobs:
           "$dsh_binary" --version
           echo "DSH_BINARY=$dsh_binary" >> "$GITHUB_ENV"
 
-      - name: Run read-only DSH research and create a temporary JSON draft
+      - name: Run bounded DSH research and return JSON
         id: curator
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
