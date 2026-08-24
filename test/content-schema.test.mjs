@@ -2,7 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { canonicalizeUrl, toSiteItem, validateDraft, validateSiteItem } from '../scripts/content-schema.mjs';
-import { estimateCny } from '../scripts/content-budget.mjs';
+import { estimateCny, readDshTelemetry } from '../scripts/content-budget.mjs';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 function validItem(overrides = {}) {
   return {
@@ -65,4 +68,20 @@ test('cost estimate uses configured CNY rates', () => {
     inputCacheHit: 0.1, inputCacheMiss: 3, output: 9,
   });
   assert.equal(amount, 3.9);
+});
+
+test('Exa MCP calls count toward the search limit', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'zhongkui-telemetry-'));
+  try {
+    const events = [
+      { type: 'tool/call', data: { name: 'mcp__exa__web_search_exa', callId: 'one' } },
+      { type: 'tool/call', data: { name: 'mcp__exa__web_search_exa', callId: 'two' } },
+      { type: 'tool/call', data: { name: 'mcp__exa__web_search_exa', callId: 'two' } },
+    ];
+    await writeFile(join(directory, 'session.jsonl'), `${events.map(JSON.stringify).join('\n')}\n`);
+    const telemetry = await readDshTelemetry(directory);
+    assert.equal(telemetry.searches, 2);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });

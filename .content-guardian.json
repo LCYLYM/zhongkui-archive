@@ -14,6 +14,7 @@
     "exaMcpUrl": "https://mcp.exa.ai/mcp?tools=web_search_exa"
   },
   "limits": {
+    "minSearches": 12,
     "maxSearches": 200,
     "synthesisAtSearches": 180,
     "maxNewItems": 10,

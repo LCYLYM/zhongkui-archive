@@ -101,6 +101,7 @@ function curatorPrompt({ config, sources, state, runDate, draftPath }) {
 目标：只使用 Exa MCP 工具 mcp__exa__web_search_exa 搜索近期官方消息、B站与 YouTube 视频、媒体文章、逐帧分析、人物与民俗考据，从所有候选中只选最多 ${config.limits.maxNewItems} 条真正新增且最有价值的资料。
 
 搜索要求：
+- 在写草稿前至少完成 ${config.limits.minSearches} 次 Exa 搜索，覆盖：官方站点/官方账号至少 3 次，中文视频与文章至少 3 次，海外视频与媒体至少 3 次，交叉核验至少 3 次。
 - 总搜索调用硬上限是 ${config.limits.maxSearches} 次；到 ${config.limits.synthesisAtSearches} 次时必须停止扩展，转入交叉核验与写入。
 - 每次 Exa 搜索优先用 5-8 个结果；不要调用其他联网工具，也不要尝试安装搜索程序。
 - 优先检查官方来源，再搜索中文解读、海外媒体和创作者反应。
@@ -226,6 +227,9 @@ async function runDsh({ config, prompt, sessionsRoot, overlayPath, credential })
   };
   await rm(dirname(sessionsRoot), { recursive: true, force: true });
   if (abortReason) throw Object.assign(abortReason, { evidence });
+  if (telemetry.searches < config.limits.minSearches) {
+    throw Object.assign(new GuardianError('INSUFFICIENT_SEARCH_COVERAGE', `search calls were below ${config.limits.minSearches}`), { evidence });
+  }
   if (telemetry.searches > config.limits.maxSearches) throw Object.assign(new GuardianError('SEARCH_LIMIT_EXCEEDED', 'search telemetry exceeded the configured limit'), { evidence });
   if (estimatedCny > config.limits.maxCny) throw Object.assign(new GuardianError('BUDGET_EXHAUSTED', 'estimated cost exceeded the configured limit'), { evidence });
   if (result.code !== 0) throw Object.assign(new GuardianError('DSH_RUN_FAILED', `DSH exited with ${result.code ?? result.signal}`), { evidence });
@@ -245,6 +249,7 @@ function publicBlocker(error) {
     MODEL_CREDENTIAL_MISSING: '缺少模型凭据，定时任务已冻结。',
     DSH_BINARY_MISSING: 'DSH 运行时未正确安装。',
     SEARCH_LIMIT_EXCEEDED: '搜索次数达到上限，未发布本轮内容。',
+    INSUFFICIENT_SEARCH_COVERAGE: '搜索覆盖不足，未发布本轮内容。',
     BUDGET_EXHAUSTED: '估算费用达到上限，未发布本轮内容。',
     TIME_LIMIT_EXCEEDED: '运行达到一小时上限，未发布本轮内容。',
     DSH_RUN_FAILED: 'DSH 本轮运行失败，未发布内容。',
