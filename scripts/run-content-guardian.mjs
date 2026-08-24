@@ -361,6 +361,7 @@ const deadline = startedAt + config.limits.maxWallMinutes * 60_000;
 let status = 'BLOCKED';
 let newItems = 0;
 let evidence = null;
+let blockerCode = '';
 
 try {
   if (state.lastInputFingerprint === inputFingerprint && trigger !== 'workflow_dispatch') {
@@ -443,6 +444,7 @@ try {
   }
 } catch (error) {
   const blocker = publicBlocker(error);
+  blockerCode = blocker.code;
   evidence = error?.evidence ?? evidence;
   status = blocker.code === 'BUDGET_EXHAUSTED' || blocker.code === 'SEARCH_LIMIT_EXCEEDED' || blocker.code === 'TIME_LIMIT_EXCEEDED'
     ? 'FROZEN'
@@ -490,5 +492,7 @@ await setOutputs({
   input_fingerprint: inputFingerprint,
   searches: evidence?.searches ?? 0,
   estimated_cny: evidence?.estimatedCny ?? 0,
+  blocker_code: blockerCode,
+  http_status: evidence?.httpStatus ?? '',
 });
-console.log(`content guardian status=${status} new_items=${newItems} searches=${evidence?.searches ?? 0} estimated_cny=${evidence?.estimatedCny ?? 0}`);
+console.log(`content guardian status=${status} new_items=${newItems} searches=${evidence?.searches ?? 0} estimated_cny=${evidence?.estimatedCny ?? 0} blocker=${blockerCode || 'none'} http_status=${evidence?.httpStatus ?? 'none'}`);
