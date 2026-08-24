@@ -8,7 +8,7 @@ dist/
 .env.*
 *.local
 
-# DSH runtime, raw sessions, temporary drafts and evidence
+# Automation runtime, raw responses, temporary drafts and evidence
 .automation/
 .content-guardian/
 *.log

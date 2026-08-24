@@ -143,8 +143,8 @@ export function validateDraft(draft, options = {}) {
     const reviewFlags = stringArray(value.reviewFlags, `${path}.reviewFlags`, { maxItems: 8, itemMax: 80 });
     const audience = stringArray(value.audience, `${path}.audience`, { maxItems: 2, itemMax: 2 });
     if (audience.length === 0 || audience.some(locale => !AUDIENCES.has(locale))) fail(`${path}.audience`, 'must contain zh and/or en');
-    if (platform === 'BILIBILI' && (audience.length !== 1 || audience[0] !== 'zh')) fail(`${path}.audience`, 'Bilibili entries are published to zh only');
-    if (platform === 'YOUTUBE' && (audience.length !== 1 || audience[0] !== 'en')) fail(`${path}.audience`, 'YouTube entries are published to en only');
+    if (platform === 'BILIBILI' && !audience.includes('zh')) fail(`${path}.audience`, 'Bilibili entries must include zh');
+    if (platform === 'YOUTUBE' && !audience.includes('en')) fail(`${path}.audience`, 'YouTube entries must include en');
     if (evidenceLevel === 'speculation' && reviewFlags.length === 0) {
       fail(`${path}.reviewFlags`, 'speculation must carry a review flag and cannot auto-publish');
     }
@@ -206,6 +206,46 @@ export function validateDraftCandidates(draft, options = {}) {
   }
   if (draft.items.length > 0 && items.length === 0) fail('draft.items', 'no candidate passed validation');
   return { draft: { schema: 1, runDate: draft.runDate, items }, discardedItems };
+}
+
+export function applyVideoAudiencePolicy(items, policy = {}) {
+  if (!Array.isArray(items)) fail('items', 'must be an array');
+  const ratio = Number(policy.videoPrimaryToCrossRatio ?? 2);
+  const maxYoutubePerCreator = Number(policy.maxYoutubeItemsPerCreatorPerRun ?? 1);
+  if (!Number.isInteger(ratio) || ratio < 1) fail('contentPolicy.videoPrimaryToCrossRatio', 'must be a positive integer');
+  if (!Number.isInteger(maxYoutubePerCreator) || maxYoutubePerCreator < 1) fail('contentPolicy.maxYoutubeItemsPerCreatorPerRun', 'must be a positive integer');
+
+  const youtubeByCreator = new Map();
+  let discardedCreatorDuplicates = 0;
+  const selected = items.filter(item => {
+    if (item.platform !== 'YOUTUBE') return true;
+    const creator = item.sourceName.normalize('NFKC').replace(/\s+/g, ' ').trim().toLocaleLowerCase('en');
+    const count = youtubeByCreator.get(creator) ?? 0;
+    if (count >= maxYoutubePerCreator) {
+      discardedCreatorDuplicates += 1;
+      return false;
+    }
+    youtubeByCreator.set(creator, count + 1);
+    return true;
+  }).map(item => ({ ...item, audience: [...item.audience] }));
+
+  let trimmedCrossAudience = 0;
+  const trimCrossPlatform = ({ locale, primaryPlatform, crossPlatform }) => {
+    const primaryCount = selected.filter(item => item.platform === primaryPlatform && item.audience.includes(locale)).length;
+    const crossItems = selected
+      .filter(item => item.platform === crossPlatform && item.audience.includes(locale))
+      .sort((left, right) => right.valueScore - left.valueScore);
+    const allowedCrossCount = Math.floor(primaryCount / ratio);
+    for (const item of crossItems.slice(allowedCrossCount)) {
+      item.audience = item.audience.filter(itemLocale => itemLocale !== locale);
+      trimmedCrossAudience += 1;
+    }
+  };
+
+  trimCrossPlatform({ locale: 'zh', primaryPlatform: 'BILIBILI', crossPlatform: 'YOUTUBE' });
+  trimCrossPlatform({ locale: 'en', primaryPlatform: 'YOUTUBE', crossPlatform: 'BILIBILI' });
+
+  return { items: selected, discardedCreatorDuplicates, trimmedCrossAudience };
 }
 
 function chinaParts(isoDate) {

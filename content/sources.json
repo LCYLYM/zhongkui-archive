@@ -34,8 +34,8 @@
     "site:youtube.com/watch Black Myth Zhong Kui protagonist clam lord breakdown"
   ],
   "audiencePolicy": {
-    "zh": "优先官网、B站与国内可访问文章；B站条目只进入中文版。",
-    "en": "优先官方英文来源、YouTube 与海外媒体；YouTube 条目只进入英文版。"
+    "zh": "优先官网、B站与国内可访问文章；中文视频中 B 站与交叉展示的 YouTube 至少保持 2:1。",
+    "en": "优先官方英文来源、多个独立 YouTube 创作者与海外媒体；英文视频中 YouTube 与交叉展示的 B 站至少保持 2:1。"
   },
   "platforms": [
     "OFFICIAL",

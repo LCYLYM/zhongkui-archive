@@ -4,13 +4,17 @@
     "timezone": "Asia/Shanghai",
     "cron": "17 8 * * *"
   },
-  "dsh": {
-    "version": "0.1.1-rc.2",
+  "model": {
     "provider": "nvidia-nim",
-    "model": "minimaxai/minimax-m3",
+    "id": "deepseek-ai/deepseek-v4-flash-0731",
     "baseUrl": "https://integrate.api.nvidia.com/v1",
     "contextWindow": 280000,
-    "maxTokens": 8192,
+    "maxTokens": 16384,
+    "stream": false,
+    "temperature": 0.2,
+    "topP": 0.95
+  },
+  "search": {
     "exaMcpUrl": "https://mcp.exa.ai/mcp"
   },
   "limits": {
@@ -24,7 +28,12 @@
     "maxPromptBytes": 110000,
     "maxCny": 10,
     "maxWallMinutes": 60,
+    "maxModelMinutes": 30,
     "maxChangedFiles": 3
+  },
+  "contentPolicy": {
+    "videoPrimaryToCrossRatio": 2,
+    "maxYoutubeItemsPerCreatorPerRun": 1
   },
   "pricing": {
     "currency": "CNY",

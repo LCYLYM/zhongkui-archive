@@ -1,13 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { canonicalizeUrl, toSiteItem, validateDraft, validateDraftCandidates, validateSiteItem } from '../scripts/content-schema.mjs';
-import { estimateCny, readDshTelemetry } from '../scripts/content-budget.mjs';
+import { applyVideoAudiencePolicy, canonicalizeUrl, toSiteItem, validateDraft, validateDraftCandidates, validateSiteItem } from '../scripts/content-schema.mjs';
+import { estimateCny } from '../scripts/content-budget.mjs';
 import { videoContextInternals } from '../scripts/video-context.mjs';
-import { classifyDshFailure, extractDshFailureCode, parseDshDraftOutput } from '../scripts/dsh-result.mjs';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { classifyNimHttpStatus, normalizeNimUsage, parseModelDraftOutput, parseNimCompletion } from '../scripts/nim-client.mjs';
 
 function validItem(overrides = {}) {
   return {
@@ -73,22 +70,6 @@ test('cost estimate uses configured CNY rates', () => {
   assert.equal(amount, 3.9);
 });
 
-test('Exa MCP calls count toward the search limit', async () => {
-  const directory = await mkdtemp(join(tmpdir(), 'zhongkui-telemetry-'));
-  try {
-    const events = [
-      { type: 'tool/call', data: { name: 'mcp__exa__web_search_exa', callId: 'one' } },
-      { type: 'tool/call', data: { name: 'mcp__exa__web_search_exa', callId: 'two' } },
-      { type: 'tool/call', data: { name: 'mcp__exa__web_search_exa', callId: 'two' } },
-    ];
-    await writeFile(join(directory, 'session.jsonl'), `${events.map(JSON.stringify).join('\n')}\n`);
-    const telemetry = await readDshTelemetry(directory);
-    assert.equal(telemetry.searches, 2);
-  } finally {
-    await rm(directory, { recursive: true, force: true });
-  }
-});
-
 test('video context discovers Bilibili and YouTube references without duplicates', () => {
   const references = videoContextInternals.extractVideoReferences([{
     evidence: 'https://www.bilibili.com/video/BV1Ew8P6pEUE/ https://youtu.be/dgU_qY0segY https://www.youtube.com/watch?v=dgU_qY0segY',
@@ -103,10 +84,10 @@ test('video context reads Bilibili subtitle bodies', () => {
   assert.equal(videoContextInternals.subtitleText({ body: [{ content: '第一句' }, { content: '第二句' }] }), '第一句\n第二句');
 });
 
-test('DSH headless final JSON is parsed without granting file writes', () => {
-  const draft = parseDshDraftOutput('{"schema":1,"runDate":"2026-08-24","items":[]}');
+test('non-streaming model final JSON is parsed without granting file writes', () => {
+  const draft = parseModelDraftOutput('{"schema":1,"runDate":"2026-08-24","items":[]}');
   assert.deepEqual(draft, { schema: 1, runDate: '2026-08-24', items: [] });
-  assert.deepEqual(parseDshDraftOutput('整理结果如下：\n{"schema":1,"items":[]}'), { schema: 1, items: [] });
+  assert.deepEqual(parseModelDraftOutput('整理结果如下：\n{"schema":1,"items":[]}'), { schema: 1, items: [] });
 });
 
 test('one invalid model candidate does not discard valid entries', () => {
@@ -119,9 +100,56 @@ test('one invalid model candidate does not discard valid entries', () => {
   assert.equal(result.discardedItems, 1);
 });
 
-test('DSH headless provider failure codes are sanitized and classified', () => {
-  const stderr = 'dsh: LLM_STREAM_IDLE_TIMEOUT: upstream stopped sending chunks';
-  assert.equal(extractDshFailureCode('', stderr), 'LLM_STREAM_IDLE_TIMEOUT');
-  assert.equal(classifyDshFailure('', stderr), 'MODEL_TIMEOUT');
-  assert.equal(classifyDshFailure('', 'dsh: SOME_PROVIDER_ERROR: detail'), 'DSH_PROVIDER_FAILED');
+test('NVIDIA completion and usage are normalized for the budget gate', () => {
+  const completion = parseNimCompletion({
+    choices: [{ finish_reason: 'stop', message: { content: '{"schema":1,"items":[]}' } }],
+    usage: {
+      prompt_tokens: 1000,
+      completion_tokens: 200,
+      prompt_tokens_details: { cached_tokens: 300 },
+      completion_tokens_details: { reasoning_tokens: 40 },
+    },
+  });
+  assert.equal(completion.output, '{"schema":1,"items":[]}');
+  assert.deepEqual(completion.usage, {
+    inputTokens: 700,
+    outputTokens: 160,
+    cacheReadTokens: 300,
+    cacheWriteTokens: 0,
+    reasoningTokens: 40,
+    totalTokens: 1200,
+  });
+  assert.equal(classifyNimHttpStatus(429), 'MODEL_RATE_LIMITED');
+  assert.equal(classifyNimHttpStatus(503), 'MODEL_SERVICE_FAILED');
+  assert.throws(() => normalizeNimUsage({}), error => error.code === 'MODEL_USAGE_MISSING');
+});
+
+test('video audience policy keeps primary platforms at two-to-one while allowing crossover', () => {
+  const bilibili = [
+    validItem({ canonicalUrl: 'https://www.bilibili.com/video/BV1abc/', sourceName: 'B站作者甲', platform: 'BILIBILI', audience: ['zh', 'en'], valueScore: 91 }),
+    validItem({ canonicalUrl: 'https://www.bilibili.com/video/BV1def/', sourceName: 'B站作者乙', platform: 'BILIBILI', audience: ['zh', 'en'], valueScore: 90 }),
+  ];
+  const youtube = [
+    validItem({ canonicalUrl: 'https://www.youtube.com/watch?v=creator-one', sourceName: 'Creator One', audience: ['zh', 'en'], valueScore: 89 }),
+    validItem({ canonicalUrl: 'https://www.youtube.com/watch?v=creator-two', sourceName: 'Creator Two', audience: ['zh', 'en'], valueScore: 88 }),
+  ];
+  const normalized = validateDraft({ schema: 1, runDate: '2026-08-24', items: [...bilibili, ...youtube] }, { maxItems: 10 }).items;
+  const result = applyVideoAudiencePolicy(normalized, { videoPrimaryToCrossRatio: 2, maxYoutubeItemsPerCreatorPerRun: 1 });
+  const zhVideos = result.items.filter(item => item.audience.includes('zh'));
+  const enVideos = result.items.filter(item => item.audience.includes('en'));
+  assert.equal(zhVideos.filter(item => item.platform === 'BILIBILI').length, 2);
+  assert.equal(zhVideos.filter(item => item.platform === 'YOUTUBE').length, 1);
+  assert.equal(enVideos.filter(item => item.platform === 'YOUTUBE').length, 2);
+  assert.equal(enVideos.filter(item => item.platform === 'BILIBILI').length, 1);
+  assert.equal(result.trimmedCrossAudience, 2);
+});
+
+test('video audience policy keeps YouTube sources diverse within one run', () => {
+  const first = validItem({ canonicalUrl: 'https://www.youtube.com/watch?v=creator-a', sourceName: 'Same Creator', valueScore: 92 });
+  const repeated = validItem({ canonicalUrl: 'https://www.youtube.com/watch?v=creator-b', sourceName: ' same  creator ', valueScore: 91 });
+  const independent = validItem({ canonicalUrl: 'https://www.youtube.com/watch?v=creator-c', sourceName: 'Independent Creator', valueScore: 90 });
+  const normalized = validateDraft({ schema: 1, runDate: '2026-08-24', items: [first, repeated, independent] }, { maxItems: 10 }).items;
+  const result = applyVideoAudiencePolicy(normalized, { videoPrimaryToCrossRatio: 2, maxYoutubeItemsPerCreatorPerRun: 1 });
+  assert.deepEqual(result.items.map(item => item.sourceName), ['Same Creator', 'Independent Creator']);
+  assert.equal(result.discardedCreatorDuplicates, 1);
 });

@@ -35,27 +35,10 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Set up pnpm for the pinned DSH runtime
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-        with:
-          version: 10.33.2
-          run_install: false
-
       - name: Install website dependencies
         run: npm ci
 
-      - name: Install the exact DSH runtime outside the repository
-        run: |
-          dsh_version=$(node -p "JSON.parse(require('fs').readFileSync('.content-guardian.json', 'utf8')).dsh.version")
-          dsh_root="$RUNNER_TEMP/dsh-runner"
-          mkdir -p "$dsh_root"
-          pnpm --dir "$dsh_root" add --save-exact "@deepseek-ai/dsh@$dsh_version"
-          dsh_binary="$dsh_root/node_modules/.bin/dsh"
-          test -x "$dsh_binary"
-          "$dsh_binary" --version
-          echo "DSH_BINARY=$dsh_binary" >> "$GITHUB_ENV"
-
-      - name: Run bounded DSH research and return JSON
+      - name: Run bounded Exa research and NVIDIA synthesis
         id: curator
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
@@ -105,7 +88,7 @@ jobs:
             echo "- 新增：${{ steps.curator.outputs.new_items || '0' }} 条"
             echo "- WebSearch：${{ steps.curator.outputs.searches || '0' }} / 200"
             echo "- 估算费用：${{ steps.curator.outputs.estimated_cny || '0' }} / 10 CNY"
-            echo '- 原始模型会话、搜索全文和环境变量未上传。'
+            echo '- 原始模型响应、搜索全文和环境变量未上传。'
           } >> "$GITHUB_STEP_SUMMARY"
 
   publish:
