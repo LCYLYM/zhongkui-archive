@@ -4,8 +4,8 @@
   "lastStatus": "BLOCKED",
   "lastRunDate": "2026-08-24",
   "blocker": {
-    "code": "E2BIG",
-    "message": "本轮内容更新被验证器拒绝。"
+    "code": "DSH_RUN_FAILED",
+    "message": "DSH 本轮运行失败，未发布内容。"
   },
   "seenUrls": [
     "https://blackmyth.game/ja/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/",
