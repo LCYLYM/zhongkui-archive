@@ -47,9 +47,10 @@ jobs:
       - name: Install the exact DSH runtime outside the repository
         run: |
           dsh_version=$(node -p "JSON.parse(require('fs').readFileSync('.content-guardian.json', 'utf8')).dsh.version")
-          mkdir -p "$RUNNER_TEMP/dsh-runner"
-          npm install --prefix "$RUNNER_TEMP/dsh-runner" --no-audit --no-fund "@deepseek-ai/dsh@$dsh_version"
-          dsh_binary="$RUNNER_TEMP/dsh-runner/node_modules/.bin/dsh"
+          dsh_root="$RUNNER_TEMP/dsh-runner"
+          mkdir -p "$dsh_root"
+          pnpm --dir "$dsh_root" add --save-exact "@deepseek-ai/dsh@$dsh_version"
+          dsh_binary="$dsh_root/node_modules/.bin/dsh"
           test -x "$dsh_binary"
           "$dsh_binary" --version
           echo "DSH_BINARY=$dsh_binary" >> "$GITHUB_ENV"
