@@ -1,22 +1,22 @@
 {
   "schema": 1,
-  "lastInputFingerprint": null,
-  "lastStatus": "NEVER_RUN",
-  "lastRunDate": null,
+  "lastInputFingerprint": "ed955b0043151fc7cf5397f60630fb19f19c817f75fd3128d8f2cdf4c75d9570",
+  "lastStatus": "NOOP",
+  "lastRunDate": "2026-08-24",
   "blocker": null,
   "seenUrls": [
+    "https://blackmyth.game/ja/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/",
     "https://gamesci.cn/zhongkui/",
-    "https://www.bilibili.com/video/BV1kS8H6VERt/",
-    "https://www.youtube.com/watch?v=oi2QgPH61JM",
     "https://www.bilibili.com/video/BV1Ew8P6pEUE/",
-    "https://www.bilibili.com/video/BV1nQ8M6vEwi/",
     "https://www.bilibili.com/video/BV1Ns8w6fE4k/",
     "https://www.bilibili.com/video/BV1eh8q6rEWN/",
-    "https://www.gcores.com/articles/218610",
-    "https://blackmyth.game/ja/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/",
+    "https://www.bilibili.com/video/BV1kS8H6VERt/",
+    "https://www.bilibili.com/video/BV1nQ8M6vEwi/",
+    "https://www.gcores.com/articles/218610/",
     "https://www.pcgamer.com/games/action/black-myth-zhong-kuis-15-minute-gameplay-reveal-shows-off-confident-swordplay-boss-fights-with-oyster-men-and-the-coolest-skeletons-ive-ever-seen/",
-    "https://www.youtube.com/watch?v=dgU_qY0segY",
+    "https://www.youtube.com/watch?v=9hSPEDNUCC4",
     "https://www.youtube.com/watch?v=RS0QPme8QX0",
-    "https://www.youtube.com/watch?v=9hSPEDNUCC4"
+    "https://www.youtube.com/watch?v=dgU_qY0segY",
+    "https://www.youtube.com/watch?v=oi2QgPH61JM"
   ]
 }
