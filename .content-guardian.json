@@ -11,13 +11,15 @@
     "baseUrl": "https://integrate.api.nvidia.com/v1",
     "contextWindow": 280000,
     "maxTokens": 8192,
-    "exaMcpUrl": "https://mcp.exa.ai/mcp?tools=web_search_exa"
+    "exaMcpUrl": "https://mcp.exa.ai/mcp"
   },
   "limits": {
     "minSearches": 12,
     "maxSearches": 200,
     "synthesisAtSearches": 180,
     "maxNewItems": 10,
+    "maxVideoContexts": 12,
+    "maxTranscriptCharsPerVideo": 24000,
     "maxCny": 10,
     "maxWallMinutes": 60,
     "maxChangedFiles": 3

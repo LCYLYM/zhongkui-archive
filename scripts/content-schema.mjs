@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 
 const ITEM_KEYS = new Set([
   'canonicalUrl', 'sourceName', 'platform', 'publishedAt', 'originalTitle', 'titleZh',
-  'titleEn', 'summaryZh', 'summaryEn', 'category', 'evidenceLevel', 'durationZh', 'durationEn', 'thumbnailUrl', 'tagsZh', 'tagsEn',
+  'titleEn', 'summaryZh', 'summaryEn', 'audience', 'category', 'evidenceLevel', 'durationZh', 'durationEn', 'thumbnailUrl', 'tagsZh', 'tagsEn',
   'links', 'evidence', 'valueScore', 'reviewFlags',
 ]);
 const LINK_KEYS = new Set(['labelZh', 'labelEn', 'url']);
@@ -12,6 +12,7 @@ const PLATFORMS = new Set(['OFFICIAL', 'BILIBILI', 'YOUTUBE', 'ARTICLE', 'NEWS']
 const CATEGORIES = new Set(['official', 'analysis', 'overseas', 'research']);
 const EVIDENCE_LEVELS = new Set(['confirmed', 'analysis', 'speculation', 'reaction']);
 const EVIDENCE_TYPES = new Set(['official', 'primary', 'secondary']);
+const AUDIENCES = new Set(['zh', 'en']);
 const TRACKING_PARAMS = new Set([
   'fbclid', 'gclid', 'igshid', 'spm_id_from', 'share_source', 'share_medium',
   'share_plat', 'share_session_id', 'share_tag', 'timestamp', 'unique_k',
@@ -140,6 +141,10 @@ export function validateDraft(draft, options = {}) {
       fail(`${path}.evidence`, 'confirmed information needs at least one official source');
     }
     const reviewFlags = stringArray(value.reviewFlags, `${path}.reviewFlags`, { maxItems: 8, itemMax: 80 });
+    const audience = stringArray(value.audience, `${path}.audience`, { maxItems: 2, itemMax: 2 });
+    if (audience.length === 0 || audience.some(locale => !AUDIENCES.has(locale))) fail(`${path}.audience`, 'must contain zh and/or en');
+    if (platform === 'BILIBILI' && (audience.length !== 1 || audience[0] !== 'zh')) fail(`${path}.audience`, 'Bilibili entries are published to zh only');
+    if (platform === 'YOUTUBE' && (audience.length !== 1 || audience[0] !== 'en')) fail(`${path}.audience`, 'YouTube entries are published to en only');
     if (evidenceLevel === 'speculation' && reviewFlags.length === 0) {
       fail(`${path}.reviewFlags`, 'speculation must carry a review flag and cannot auto-publish');
     }
@@ -159,6 +164,7 @@ export function validateDraft(draft, options = {}) {
       titleEn: text(value.titleEn, `${path}.titleEn`, { max: 180 }),
       summaryZh: text(value.summaryZh, `${path}.summaryZh`, { min: 12, max: 320 }),
       summaryEn: text(value.summaryEn, `${path}.summaryEn`, { min: 24, max: 500 }),
+      audience,
       category,
       evidenceLevel,
       durationZh: text(value.durationZh, `${path}.durationZh`, { max: 30 }),
@@ -216,6 +222,7 @@ export function toSiteItem(item, collectedAt = new Date().toISOString()) {
     titleEn: item.titleEn,
     summary: item.summaryZh,
     summaryEn: item.summaryEn,
+    audience: item.audience,
     evidence: item.evidenceLevel,
     duration: item.durationZh,
     durationEn: item.durationEn,
@@ -242,6 +249,7 @@ export function validateSiteItem(item, path = 'siteItem') {
   for (const key of ['titleEn', 'summaryEn', 'platformEn', 'durationEn']) {
     if (typeof item[key] !== 'string' || item[key].trim() === '') fail(`${path}.${key}`, 'must be a non-empty English string');
   }
+  if (!Array.isArray(item.audience) || item.audience.length < 1 || item.audience.some(locale => !AUDIENCES.has(locale))) fail(`${path}.audience`, 'must contain zh and/or en');
   if (!CATEGORIES.has(item.type)) fail(`${path}.type`, 'has an unsupported category');
   if (!EVIDENCE_LEVELS.has(item.evidence)) fail(`${path}.evidence`, 'has an unsupported evidence level');
   if (!/^\d{4}\.\d{2}\.\d{2}$/.test(item.date)) fail(`${path}.date`, 'must use YYYY.MM.DD');

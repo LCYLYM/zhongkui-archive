@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import { canonicalizeUrl, toSiteItem, validateDraft, validateSiteItem } from '../scripts/content-schema.mjs';
 import { estimateCny, readDshTelemetry } from '../scripts/content-budget.mjs';
+import { videoContextInternals } from '../scripts/video-context.mjs';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -18,6 +19,7 @@ function validItem(overrides = {}) {
     titleEn: 'Official Black Myth: Zhong Kui Update',
     summaryZh: '官方频道发布新的内容说明，条目仅整理视频中可以直接确认的信息。',
     summaryEn: 'The official channel published an update. This entry only records information that can be confirmed directly from the source.',
+    audience: ['en'],
     category: 'official',
     evidenceLevel: 'confirmed',
     durationZh: '03:20',
@@ -84,4 +86,18 @@ test('Exa MCP calls count toward the search limit', async () => {
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+test('video context discovers Bilibili and YouTube references without duplicates', () => {
+  const references = videoContextInternals.extractVideoReferences([{
+    evidence: 'https://www.bilibili.com/video/BV1Ew8P6pEUE/ https://youtu.be/dgU_qY0segY https://www.youtube.com/watch?v=dgU_qY0segY',
+  }]);
+  assert.deepEqual(references.map(item => `${item.platform}:${item.id}`), [
+    'BILIBILI:BV1Ew8P6pEUE',
+    'YOUTUBE:dgU_qY0segY',
+  ]);
+});
+
+test('video context reads Bilibili subtitle bodies', () => {
+  assert.equal(videoContextInternals.subtitleText({ body: [{ content: '第一句' }, { content: '第二句' }] }), '第一句\n第二句');
 });

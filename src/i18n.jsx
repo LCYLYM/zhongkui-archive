@@ -81,11 +81,13 @@ const copy = {
     'frames.judge': '回原片自行判断',
     'dossiers.title': '人物志',
     'dossiers.subtitle': '目前公开画面中可辨认的角色与对象',
-    'dossiers.index': '三份活档案',
+    'dossiers.index': '共 {count} 份档案',
     'dossiers.confirmed': '已确认 {count}',
     'dossiers.pending': '待考 {count}',
     'dossiers.facts': '可复核记录',
     'dossiers.questions': '仍在雾中',
+    'dossiers.sources': '相关解读与原片',
+    'dossiers.noSources': '暂无可核验的相关资料。',
     'overseas.title': '海外回响',
     'overseas.subtitle': '海外媒体、视频作者与玩家反应',
     'overseas.note': '保留原作者、原视频与发布时间；观点仅代表各自作者。',
@@ -190,11 +192,13 @@ const copy = {
     'frames.judge': 'Return to the footage',
     'dossiers.title': 'Dossiers',
     'dossiers.subtitle': 'Characters and figures identifiable in public footage',
-    'dossiers.index': 'THREE ACTIVE FILES',
+    'dossiers.index': '{count} ACTIVE FILES',
     'dossiers.confirmed': 'Confirmed {count}',
     'dossiers.pending': 'Open {count}',
     'dossiers.facts': 'Checkable record',
     'dossiers.questions': 'Still unresolved',
+    'dossiers.sources': 'Related footage and analysis',
+    'dossiers.noSources': 'No verified related source yet.',
     'overseas.title': 'Overseas Response',
     'overseas.subtitle': 'International media, video creators and player reactions',
     'overseas.note': 'Original author, link and publication date are preserved. Views belong to their authors.',
@@ -262,7 +266,10 @@ export function useI18n() {
 }
 
 export function localizeItem(item, locale) {
-  if (locale !== 'en') return item;
+  const localizedLinks = item.links
+    .filter((link) => !Array.isArray(link.audience) || link.audience.includes(locale))
+    .map((link) => locale === 'en' ? { ...link, label: link.labelEn ?? link.label } : link);
+  if (locale !== 'en') return { ...item, links: localizedLinks };
   return {
     ...item,
     title: item.titleEn ?? item.title,
@@ -271,6 +278,6 @@ export function localizeItem(item, locale) {
     platform: item.platformEn ?? item.platform,
     duration: item.durationEn ?? item.duration,
     tags: item.tagsEn ?? item.tags,
-    links: item.links.map((link) => ({ ...link, label: link.labelEn ?? link.label })),
+    links: localizedLinks,
   };
 }

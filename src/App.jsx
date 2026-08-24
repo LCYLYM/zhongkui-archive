@@ -30,7 +30,14 @@ export default function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const localizedItems = useMemo(() => sourceItems.map((item) => localizeItem(item, locale)), [locale]);
+  const localizedItems = useMemo(() => sourceItems
+    .filter((item) => {
+      if (Array.isArray(item.audience)) return item.audience.includes(locale);
+      if (item.platform === 'BILIBILI') return locale === 'zh';
+      if (item.platform === 'YOUTUBE') return locale === 'en';
+      return true;
+    })
+    .map((item) => localizeItem(item, locale)), [locale]);
   const overseas = useMemo(() => localizedItems.filter((item) => item.type === 'overseas'), [localizedItems]);
   const selectedItem = useMemo(() => localizedItems.find((item) => item.id === selectedId) ?? null, [localizedItems, selectedId]);
 
@@ -69,7 +76,7 @@ export default function App() {
           <SourceStream items={localizedItems} savedIds={savedIds} onToggleSaved={toggleSaved} onOpenItem={openItem} />
           <Origins />
           <FrameArchive onPlayAt={setVideoSeconds} />
-          <Dossiers />
+          <Dossiers items={localizedItems} onOpenItem={openItem} />
           <Overseas items={overseas} onOpenItem={openItem} />
           <SavedSection items={localizedItems.filter((item) => savedIds.has(item.id))} onOpenItem={openItem} />
           <SiteFooter />

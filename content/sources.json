@@ -16,13 +16,27 @@
     }
   ],
   "queries": [
-    "黑神话 钟馗 官方 最新",
-    "黑神话 钟馗 实机 解析 考据",
-    "黑神话 钟馗 人物 怪物 民俗",
-    "Black Myth Zhong Kui official gameplay",
-    "Black Myth Zhong Kui analysis reaction",
-    "Black Myth Zhong Kui mythology folklore"
+    "site:gamesci.cn/zhongkui 黑神话 钟馗 官方 最新",
+    "site:bilibili.com 黑神话官方 钟馗 最新 视频",
+    "site:youtube.com/@BlackMythGame Black Myth Zhong Kui official latest",
+    "黑神话 钟馗 15分钟 实机 逐帧 解析 B站",
+    "黑神话 钟馗 主角 人物 大蚌真君 解析",
+    "黑神话 钟馗 怪物 符箓 道教 民俗 考据",
+    "黑神话 钟馗 剧情 战斗 系统 画面 分析",
+    "Black Myth Zhong Kui latest official news gameplay",
+    "Black Myth Zhong Kui gameplay breakdown YouTube",
+    "Black Myth Zhong Kui reaction YouTube creators",
+    "Black Myth Zhong Kui media analysis PC Gamer IGN",
+    "Black Myth Zhong Kui Japanese Korean analysis folklore",
+    "site:bilibili.com 黑神话 钟馗 白衣剑士 水中女子 人物解析",
+    "site:bilibili.com 黑神话 钟馗 大蚌真君 灰发老人 考据",
+    "site:youtube.com/watch Black Myth Zhong Kui character analysis lore",
+    "site:youtube.com/watch Black Myth Zhong Kui protagonist clam lord breakdown"
   ],
+  "audiencePolicy": {
+    "zh": "优先官网、B站与国内可访问文章；B站条目只进入中文版。",
+    "en": "优先官方英文来源、YouTube 与海外媒体；YouTube 条目只进入英文版。"
+  },
   "platforms": [
     "OFFICIAL",
     "BILIBILI",
