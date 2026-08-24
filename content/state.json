@@ -1,9 +1,12 @@
 {
   "schema": 1,
-  "lastInputFingerprint": "ed955b0043151fc7cf5397f60630fb19f19c817f75fd3128d8f2cdf4c75d9570",
-  "lastStatus": "NOOP",
+  "lastInputFingerprint": "71e144ed6533fe832ed0dcc3100e2714f7fdb506b2191bfe0594bbe2eada788c",
+  "lastStatus": "BLOCKED",
   "lastRunDate": "2026-08-24",
-  "blocker": null,
+  "blocker": {
+    "code": "INSUFFICIENT_SEARCH_COVERAGE",
+    "message": "搜索覆盖不足，未发布本轮内容。"
+  },
   "seenUrls": [
     "https://blackmyth.game/ja/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/",
     "https://gamesci.cn/zhongkui/",
