@@ -1,0 +1,164 @@
+name: 钟馗志 · 每日资料更新
+
+on:
+  schedule:
+    - cron: '17 8 * * *'
+      timezone: Asia/Shanghai
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zhongkui-daily-content
+  cancel-in-progress: false
+
+jobs:
+  curate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    outputs:
+      status: ${{ steps.curator.outputs.status }}
+      new_items: ${{ steps.curator.outputs.new_items }}
+      searches: ${{ steps.curator.outputs.searches }}
+      estimated_cny: ${{ steps.curator.outputs.estimated_cny }}
+      changed: ${{ steps.patch.outputs.changed }}
+    steps:
+      - name: Check out the reviewed website without write credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node 24
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Set up pnpm for the pinned DSH runtime
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        with:
+          version: 10.33.2
+          run_install: false
+
+      - name: Install website dependencies
+        run: npm ci
+
+      - name: Install the exact DSH runtime outside the repository
+        run: |
+          dsh_version=$(node -p "JSON.parse(require('fs').readFileSync('.content-guardian.json', 'utf8')).dsh.version")
+          mkdir -p "$RUNNER_TEMP/dsh-runner"
+          npm install --prefix "$RUNNER_TEMP/dsh-runner" --no-audit --no-fund "@deepseek-ai/dsh@$dsh_version"
+          dsh_binary="$RUNNER_TEMP/dsh-runner/node_modules/.bin/dsh"
+          test -x "$dsh_binary"
+          "$dsh_binary" --version
+          echo "DSH_BINARY=$dsh_binary" >> "$GITHUB_ENV"
+
+      - name: Run read-only DSH research and create a temporary JSON draft
+        id: curator
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: node scripts/run-content-guardian.mjs
+
+      - name: Generate the website data module
+        run: npm run content:build
+
+      - name: Enforce the data-only diff and content contract
+        run: node scripts/verify-content-update.mjs
+
+      - name: Run privacy, tests and production build
+        run: |
+          npm run privacy:check
+          npm test
+          npm run build
+
+      - name: Prepare the independently verified content patch
+        id: patch
+        run: |
+          git add -- content/state.json content/entries/automated src/data/automated-content.json
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            git diff --cached --binary --full-index --no-ext-diff > "$RUNNER_TEMP/content.patch"
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload the verified public content patch
+        if: steps.patch.outputs.changed == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: zhongkui-content-${{ github.run_id }}
+          path: ${{ runner.temp }}/content.patch
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Write the sanitized run summary
+        if: always()
+        run: |
+          {
+            echo '## 钟馗志每日资料更新'
+            echo
+            echo "- 状态：${{ steps.curator.outputs.status || 'FAILED_BEFORE_REPORT' }}"
+            echo "- 新增：${{ steps.curator.outputs.new_items || '0' }} 条"
+            echo "- WebSearch：${{ steps.curator.outputs.searches || '0' }} / 200"
+            echo "- 估算费用：${{ steps.curator.outputs.estimated_cny || '0' }} / 10 CNY"
+            echo '- 原始模型会话、搜索全文和环境变量未上传。'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  publish:
+    needs: curate
+    if: needs.curate.result == 'success' && needs.curate.outputs.changed == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the exact source with publisher credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: true
+
+      - name: Download the verified patch
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v7.0.1
+        with:
+          name: zhongkui-content-${{ github.run_id }}
+          path: ${{ runner.temp }}/verified-content
+
+      - name: Apply and recheck the exact patch
+        run: |
+          git apply --index "$RUNNER_TEMP/verified-content/content.patch"
+          git diff --cached --check
+          npm ci
+          npm run check
+
+      - name: Publish one content-only commit
+        env:
+          TARGET_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git config user.name 'zhongkui-content-guardian[bot]'
+          git config user.email 'zhongkui-content-guardian[bot]@users.noreply.github.com'
+          git commit -m "content: refresh source archive $(date -u +%F)"
+          git push origin "HEAD:$TARGET_BRANCH"
+
+  result:
+    needs: [curate, publish]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Require a converged content result
+        env:
+          CURATE_RESULT: ${{ needs.curate.result }}
+          GUARDIAN_STATUS: ${{ needs.curate.outputs.status }}
+          PUBLISH_RESULT: ${{ needs.publish.result }}
+          CHANGED: ${{ needs.curate.outputs.changed }}
+        run: |
+          test "$CURATE_RESULT" = 'success'
+          case "$GUARDIAN_STATUS" in
+            PASS|NOOP) ;;
+            *) echo "content guardian stopped in $GUARDIAN_STATUS" >&2; exit 1 ;;
+          esac
+          if test "$CHANGED" = 'true'; then test "$PUBLISH_RESULT" = 'success'; fi

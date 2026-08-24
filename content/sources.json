@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "topic": "黑神话：钟馗 / Black Myth: Zhong Kui",
+  "official": [
+    {
+      "name": "《黑神话：钟馗》官网",
+      "url": "https://gamesci.cn/zhongkui/"
+    },
+    {
+      "name": "黑神话官方 B 站账号",
+      "url": "https://space.bilibili.com/642389251"
+    },
+    {
+      "name": "Black Myth 官方 YouTube",
+      "url": "https://www.youtube.com/@BlackMythGame"
+    }
+  ],
+  "queries": [
+    "黑神话 钟馗 官方 最新",
+    "黑神话 钟馗 实机 解析 考据",
+    "黑神话 钟馗 人物 怪物 民俗",
+    "Black Myth Zhong Kui official gameplay",
+    "Black Myth Zhong Kui analysis reaction",
+    "Black Myth Zhong Kui mythology folklore"
+  ],
+  "platforms": [
+    "OFFICIAL",
+    "BILIBILI",
+    "YOUTUBE",
+    "ARTICLE",
+    "NEWS"
+  ]
+}

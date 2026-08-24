@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "schedule": {
+    "timezone": "Asia/Shanghai",
+    "cron": "17 8 * * *"
+  },
+  "dsh": {
+    "version": "0.1.1-rc.2",
+    "provider": "nvidia-nim",
+    "model": "minimaxai/minimax-m3",
+    "baseUrl": "https://integrate.api.nvidia.com/v1",
+    "contextWindow": 280000,
+    "maxTokens": 8192,
+    "exaMcpUrl": "https://mcp.exa.ai/mcp?tools=web_search_exa"
+  },
+  "limits": {
+    "maxSearches": 200,
+    "synthesisAtSearches": 180,
+    "maxNewItems": 10,
+    "maxCny": 10,
+    "maxWallMinutes": 60,
+    "maxChangedFiles": 3
+  },
+  "pricing": {
+    "currency": "CNY",
+    "unit": "per_million_tokens",
+    "basis": "conservative-shadow-budget",
+    "inputCacheHit": 0.1,
+    "inputCacheMiss": 3,
+    "output": 9
+  },
+  "paths": {
+    "draft": ".automation/draft.json",
+    "report": ".automation/report.json",
+    "entries": "content/entries/automated",
+    "state": "content/state.json",
+    "generated": "src/data/automated-content.json"
+  }
+}

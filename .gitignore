@@ -1,0 +1,24 @@
+node_modules/
+dist/
+.vite/
+.DS_Store
+
+# Local credentials and machine-specific configuration
+.env
+.env.*
+*.local
+
+# DSH runtime, raw sessions, temporary drafts and evidence
+.automation/
+.content-guardian/
+*.log
+logs/
+sessions/
+
+# Local-only project notes and generated reports are intentionally not public
+docs/
+notes/
+reports/
+playwright-report/
+test-results/
+coverage/
