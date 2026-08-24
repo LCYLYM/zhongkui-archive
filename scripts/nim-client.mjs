@@ -55,6 +55,33 @@ export function parseNimCompletion(payload) {
   return { output, usage: normalizeNimUsage(payload.usage) };
 }
 
+export function parseNimStream(text) {
+  const chunks = [];
+  let usage = null;
+  let finishReason = null;
+  for (const line of String(text ?? '').split(/\r?\n/)) {
+    if (!line.startsWith('data:')) continue;
+    const data = line.slice(5).trim();
+    if (!data || data === '[DONE]') continue;
+    let event;
+    try { event = JSON.parse(data); }
+    catch { throw Object.assign(new Error('NVIDIA NIM stream contained invalid JSON'), { code: 'MODEL_PROTOCOL_FAILED' }); }
+    if (event.usage) usage = event.usage;
+    const choice = event.choices?.[0];
+    if (!choice) continue;
+    if (choice.finish_reason) finishReason = choice.finish_reason;
+    const content = choice.delta?.content;
+    if (typeof content === 'string') chunks.push(content);
+    else if (Array.isArray(content)) {
+      chunks.push(content.filter(block => block?.type === 'text' && typeof block.text === 'string').map(block => block.text).join(''));
+    }
+  }
+  return {
+    choices: [{ finish_reason: finishReason, message: { content: chunks.join('') } }],
+    usage,
+  };
+}
+
 export function classifyNimHttpStatus(status) {
   if (status === 401 || status === 403) return 'MODEL_AUTH_FAILED';
   if (status === 408 || status === 504) return 'MODEL_TIMEOUT';

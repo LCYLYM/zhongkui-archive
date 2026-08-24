@@ -4,7 +4,7 @@ import test from 'node:test';
 import { applyVideoAudiencePolicy, canonicalizeUrl, toSiteItem, validateDraft, validateDraftCandidates, validateSiteItem } from '../scripts/content-schema.mjs';
 import { estimateCny } from '../scripts/content-budget.mjs';
 import { videoContextInternals } from '../scripts/video-context.mjs';
-import { classifyNimHttpStatus, normalizeNimUsage, parseModelDraftOutput, parseNimCompletion } from '../scripts/nim-client.mjs';
+import { classifyNimHttpStatus, normalizeNimUsage, parseModelDraftOutput, parseNimCompletion, parseNimStream } from '../scripts/nim-client.mjs';
 
 function validItem(overrides = {}) {
   return {
@@ -122,6 +122,18 @@ test('NVIDIA completion and usage are normalized for the budget gate', () => {
   assert.equal(classifyNimHttpStatus(429), 'MODEL_RATE_LIMITED');
   assert.equal(classifyNimHttpStatus(503), 'MODEL_SERVICE_FAILED');
   assert.throws(() => normalizeNimUsage({}), error => error.code === 'MODEL_USAGE_MISSING');
+});
+
+test('NVIDIA streaming chunks are assembled with final usage', () => {
+  const payload = parseNimStream([
+    'data: {"choices":[{"delta":{"content":"{\\"schema\\":"},"finish_reason":null}]}',
+    'data: {"choices":[{"delta":{"content":"1}"},"finish_reason":"stop"}]}',
+    'data: {"choices":[],"usage":{"prompt_tokens":12,"completion_tokens":4}}',
+    'data: [DONE]',
+  ].join('\n'));
+  const completion = parseNimCompletion(payload);
+  assert.equal(completion.output, '{"schema":1}');
+  assert.equal(completion.usage.totalTokens, 16);
 });
 
 test('video audience policy keeps primary platforms at two-to-one while allowing crossover', () => {

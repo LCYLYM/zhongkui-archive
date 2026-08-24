@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { estimateCny } from './content-budget.mjs';
 import { applyVideoAudiencePolicy, canonicalizeUrl, toSiteItem, validateDraftCandidates } from './content-schema.mjs';
-import { classifyNimHttpStatus, parseModelDraftOutput, parseNimCompletion } from './nim-client.mjs';
+import { classifyNimHttpStatus, parseModelDraftOutput, parseNimCompletion, parseNimStream } from './nim-client.mjs';
 import { collectVideoContexts } from './video-context.mjs';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -239,8 +239,8 @@ async function runNvidiaModel({ config, prompt, credential, searches, startedAt,
         temperature: config.model.temperature,
         top_p: config.model.topP,
         max_tokens: config.model.maxTokens,
-        stream: false,
-        chat_template_kwargs: { thinking: false },
+        stream: config.model.stream,
+        stream_options: config.model.stream ? { include_usage: true } : undefined,
       }),
       signal: controller.signal,
     });
@@ -249,7 +249,7 @@ async function runNvidiaModel({ config, prompt, credential, searches, startedAt,
       throw new GuardianError(classifyNimHttpStatus(response.status), `NVIDIA NIM rejected the request with HTTP ${response.status}`);
     }
     let payload;
-    try { payload = JSON.parse(responseText); }
+    try { payload = config.model.stream ? parseNimStream(responseText) : JSON.parse(responseText); }
     catch { throw new GuardianError('MODEL_PROTOCOL_FAILED', 'NVIDIA NIM returned invalid JSON'); }
     let completion;
     try { completion = parseNimCompletion(payload); }
