@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "lastInputFingerprint": "79ba0c4414996cd1e1eaa9d63100b2e1277241440befe28ea54486266cd3c463",
+  "lastInputFingerprint": "d2088f72720f7c97ad41e0dad3c151a75070f94e12d64592c0a90b228c7e0547",
   "lastStatus": "BLOCKED",
-  "lastRunDate": "2026-08-24",
+  "lastRunDate": "2026-08-25",
   "blocker": {
-    "code": "DSH_RUN_FAILED",
-    "message": "DSH 本轮运行失败，未发布内容。"
+    "code": "MODEL_REQUEST_REJECTED",
+    "message": "NVIDIA 模型服务拒绝了请求，未发布本轮内容。"
   },
   "seenUrls": [
     "https://blackmyth.game/ja/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/",
