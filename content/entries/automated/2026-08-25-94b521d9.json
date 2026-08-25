@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "runDate": "2026-08-25",
+  "generatedAt": "2026-08-25T01:54:56.943Z",
+  "items": [
+    {
+      "id": "auto-12b3a0fcdf2f55",
+      "type": "analysis",
+      "date": "2025.08.25",
+      "time": "09:53",
+      "source": "KhrazeGaming",
+      "platform": "YOUTUBE",
+      "platformEn": "YOUTUBE",
+      "title": "什么是《黑神话：钟馗》？你需要知道的一切...",
+      "titleEn": "What Is Black Myth: Zhong Kui? Everything You Need To Know ...",
+      "summary": "KhrazeGaming在游戏公布后制作的介绍视频，汇总官方FAQ信息，解释游戏为单机ARPG，取材中国神话，主角为钟馗。",
+      "summaryEn": "KhrazeGaming's overview video after the announcement, summarizing official FAQ, describing the game as a single-player ARPG rooted in Chinese mythology with Zhong Kui as protagonist.",
+      "audience": [
+        "en"
+      ],
+      "evidence": "analysis",
+      "duration": "未知",
+      "durationEn": "Unknown",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "介绍",
+        "钟馗",
+        "ARPG"
+      ],
+      "tagsEn": [
+        "overview",
+        "Zhong Kui",
+        "ARPG"
+      ],
+      "links": [
+        {
+          "label": "观看原片",
+          "labelEn": "Watch source",
+          "url": "https://www.youtube.com/watch?v=e306_197524"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://www.youtube.com/watch?v=e306_197524",
+        "originalTitle": "What Is Black Myth: Zhong Kui? Everything You Need To Know ...",
+        "publishedAt": "2025-08-25T01:53:24.961Z",
+        "collectedAt": "2026-08-25T01:54:56.943Z",
+        "valueScore": 55,
+        "evidence": [
+          {
+            "url": "https://www.youtube.com/watch?v=e306_197524",
+            "type": "primary",
+            "supports": "创作者基于官方FAQ的解读。",
+            "supportsEn": "Creator's interpretation based on official FAQ."
+          }
+        ]
+      }
+    }
+  ]
+}
