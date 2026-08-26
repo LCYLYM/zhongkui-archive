@@ -1,0 +1,282 @@
+{
+  "schema": 1,
+  "runDate": "2026-08-26",
+  "generatedAt": "2026-08-26T02:04:12.742Z",
+  "items": [
+    {
+      "id": "auto-9eb8273cc21068",
+      "type": "analysis",
+      "date": "2026.08.21",
+      "time": "08:00",
+      "source": "blackmyth.game Editorial Desk",
+      "platform": "文章",
+      "platformEn": "ARTICLE",
+      "title": "《黑神话：钟馗》15分钟实机逐帧拆解",
+      "titleEn": "Black Myth: Zhong Kui 15-Minute Gameplay Frame-by-Frame Breakdown",
+      "summary": "blackmyth.game编辑部的逐帧拆解，将演示分为八段时间轴，区分官方文字、画面文字、可见画面和跨帧推理。确认了“大蚌真君”为官方HUD名称，白衣角色被编辑识别为年轻钟馗但官方未点名，并列出未确认清单（招架、召唤、双主角、坐骑等）。",
+      "summaryEn": "Frame-by-frame breakdown by blackmyth.game editorial desk, dividing the demo into eight segments and separating official text, on-screen text, visible imagery, and cross-frame inference. Confirms 'Great Clam Lord' as official HUD name; identifies white-clad character as young Zhong Kui (editorial, not official); lists unconfirmed items (parry, summon, dual protagonists, mount).",
+      "audience": [
+        "zh",
+        "en"
+      ],
+      "evidence": "analysis",
+      "duration": "文章",
+      "durationEn": "Article",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "逐帧解析",
+        "大蚌真君",
+        "白衣剑客",
+        "时间轴",
+        "未确认清单"
+      ],
+      "tagsEn": [
+        "frame-by-frame",
+        "Great Clam Lord",
+        "white-clad swordsman",
+        "timeline",
+        "unconfirmed list"
+      ],
+      "links": [
+        {
+          "label": "阅读原文",
+          "labelEn": "Read source",
+          "url": "https://blackmyth.game/zh-tw/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://blackmyth.game/zh-tw/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/",
+        "originalTitle": "黑神話：鍾馗 15 分鐘實機拆解",
+        "publishedAt": "2026-08-21T00:00:00.000Z",
+        "collectedAt": "2026-08-26T02:04:12.742Z",
+        "valueScore": 88,
+        "evidence": [
+          {
+            "url": "https://blackmyth.game/zh-tw/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/",
+            "type": "secondary",
+            "supports": "提供逐帧拆解，确认HUD名称和未确认清单。",
+            "supportsEn": "Provides frame-by-frame breakdown, confirms HUD name and unconfirmed list."
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-0b339d6c3c90ce",
+      "type": "overseas",
+      "date": "2026.08.24",
+      "time": "08:00",
+      "source": "IGN (Tim Brinkhof)",
+      "platform": "文章",
+      "platformEn": "ARTICLE",
+      "title": "《黑神话：钟馗》看起来不如《悟空》宏大——但这很好",
+      "titleEn": "Black Myth: Zhong Kui Doesn’t Look as Epic as Wukong – and That’s Great",
+      "summary": "IGN评论文章，作者Tim Brinkhof认为《钟馗》的实机演示显示出比《悟空》更接地气、更注重故事和角色的方向，虽然初看不如前作宏大，但越思考越喜欢。提到战斗新增招架机制，并认为游戏可能更注重剧情和角色。",
+      "summaryEn": "IGN opinion piece by Tim Brinkhof, arguing that Zhong Kui's gameplay reveal shows a grittier, more grounded approach compared to Wukong, which initially seemed disappointing but becomes more appealing upon reflection. Mentions new parrying mechanic and suggests the game may focus more on story and characters.",
+      "audience": [
+        "en"
+      ],
+      "evidence": "analysis",
+      "duration": "文章",
+      "durationEn": "Article",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "IGN",
+        "评论",
+        "风格对比",
+        "招架",
+        "剧情导向"
+      ],
+      "tagsEn": [
+        "IGN",
+        "opinion",
+        "style comparison",
+        "parry",
+        "story-focused"
+      ],
+      "links": [
+        {
+          "label": "阅读原文",
+          "labelEn": "Read source",
+          "url": "https://in.ign.com/black-myth-zhong-kut/269828/black-myth-zhong-kui-doesnt-look-as-epic-as-wukong-and-thats-great/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://in.ign.com/black-myth-zhong-kut/269828/black-myth-zhong-kui-doesnt-look-as-epic-as-wukong-and-thats-great/",
+        "originalTitle": "Black Myth: Zhong Kui Doesn’t Look as Epic as Wukong – and That’s Great",
+        "publishedAt": "2026-08-24T00:00:00.000Z",
+        "collectedAt": "2026-08-26T02:04:12.742Z",
+        "valueScore": 75,
+        "evidence": [
+          {
+            "url": "https://in.ign.com/black-myth-zhong-kut/269828/black-myth-zhong-kui-doesnt-look-as-epic-as-wukong-and-thats-great/",
+            "type": "secondary",
+            "supports": "提供海外媒体视角，分析风格差异。",
+            "supportsEn": "Provides overseas media perspective on style differences."
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-08ec97f1b2a421",
+      "type": "analysis",
+      "date": "2026.08.20",
+      "time": "19:46",
+      "source": "游戏X博士",
+      "platform": "BILIBILI",
+      "platformEn": "BILIBILI",
+      "title": "被喷换皮的《黑神话：钟馗》 你到底看懂了吗？",
+      "titleEn": "Black Myth: Zhong Kui Accused of Being a Reskin - Do You Really Understand It?",
+      "summary": "游戏X博士的解析视频，回应“换皮”批评，深入解读钟馗PV中的细节和设计意图。视频时长约11分钟，作者观点明确，属于玩家反应和解读。",
+      "summaryEn": "Video by 游戏X博士 responding to 'reskin' criticism, offering in-depth interpretation of the Zhong Kui PV details and design intentions. About 11 minutes long, author's perspective, categorized as player reaction and analysis.",
+      "audience": [
+        "zh"
+      ],
+      "evidence": "reaction",
+      "duration": "11分9秒",
+      "durationEn": "11:09",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "换皮争议",
+        "解析",
+        "玩家反应",
+        "钟馗"
+      ],
+      "tagsEn": [
+        "reskin controversy",
+        "analysis",
+        "player reaction",
+        "Zhong Kui"
+      ],
+      "links": [
+        {
+          "label": "查看原视频",
+          "labelEn": "Watch source",
+          "url": "https://www.bilibili.com/video/BV11U8c6WEuh/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://www.bilibili.com/video/BV11U8c6WEuh/",
+        "originalTitle": "被喷换皮的《黑神话：钟馗》 你到底看懂了吗？【X博士奇谈】",
+        "publishedAt": "2026-08-20T11:46:43.000Z",
+        "collectedAt": "2026-08-26T02:04:12.742Z",
+        "valueScore": 70,
+        "evidence": [
+          {
+            "url": "https://www.bilibili.com/video/BV11U8c6WEuh/",
+            "type": "secondary",
+            "supports": "提供玩家视角的解读和反应。",
+            "supportsEn": "Provides player perspective and reaction."
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-e2ecd2e11cec49",
+      "type": "official",
+      "date": "2026.02.10",
+      "time": "10:41",
+      "source": "英伟达GeForce",
+      "platform": "BILIBILI",
+      "platformEn": "BILIBILI",
+      "title": "游戏科学《黑神话：钟馗》全新6分钟实机",
+      "titleEn": "Game Science Black Myth: Zhong Kui - New 6-Minute Gameplay",
+      "summary": "英伟达GeForce发布的6分钟实机短片，为马年春节专门录制，与游戏实际剧情无关。展示了游戏画面和技术效果。",
+      "summaryEn": "6-minute gameplay short by NVIDIA GeForce, made for the Year of the Horse Spring Festival, not related to actual game story. Showcases graphics and tech.",
+      "audience": [
+        "zh"
+      ],
+      "evidence": "confirmed",
+      "duration": "6分47秒",
+      "durationEn": "6:47",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "英伟达",
+        "6分钟实机",
+        "春节",
+        "技术演示"
+      ],
+      "tagsEn": [
+        "NVIDIA",
+        "6-minute gameplay",
+        "Spring Festival",
+        "tech demo"
+      ],
+      "links": [
+        {
+          "label": "查看原视频",
+          "labelEn": "Watch source",
+          "url": "https://www.bilibili.com/video/BV1S7FUzNEiZ/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://www.bilibili.com/video/BV1S7FUzNEiZ/",
+        "originalTitle": "游戏科学《黑神话：钟馗》全新 6 分钟实机",
+        "publishedAt": "2026-02-10T02:41:39.000Z",
+        "collectedAt": "2026-08-26T02:04:12.742Z",
+        "valueScore": 65,
+        "evidence": [
+          {
+            "url": "https://www.bilibili.com/video/BV1S7FUzNEiZ/",
+            "type": "official",
+            "supports": "英伟达官方发布的实机短片，展示技术效果。",
+            "supportsEn": "Official NVIDIA upload showcasing tech."
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-cc27d56a6b0a14",
+      "type": "research",
+      "date": "2025.08.14",
+      "time": "11:06",
+      "source": "大脸怪爸爸",
+      "platform": "BILIBILI",
+      "platformEn": "BILIBILI",
+      "title": "钟馗的前世今生之鬼王的滥觞！上古神话那些事",
+      "titleEn": "The Origin of Zhong Kui: The Rise of the Ghost King! Stories of Ancient Mythology",
+      "summary": "大脸怪爸爸的民俗考据视频，讲述钟馗神话的起源和演变，属于人物背景研究。",
+      "summaryEn": "Folklore research video by 大脸怪爸爸 about the origins and evolution of Zhong Kui mythology, useful for character background.",
+      "audience": [
+        "zh"
+      ],
+      "evidence": "analysis",
+      "duration": "15分5秒",
+      "durationEn": "15:05",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "钟馗",
+        "神话考据",
+        "民俗",
+        "鬼王"
+      ],
+      "tagsEn": [
+        "Zhong Kui",
+        "mythology research",
+        "folklore",
+        "Ghost King"
+      ],
+      "links": [
+        {
+          "label": "查看原视频",
+          "labelEn": "Watch source",
+          "url": "https://www.bilibili.com/video/BV1CCbBzBEG1/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://www.bilibili.com/video/BV1CCbBzBEG1/",
+        "originalTitle": "钟馗的前世今生之鬼王的滥觞！上古神话那些事",
+        "publishedAt": "2025-08-14T03:06:24.000Z",
+        "collectedAt": "2026-08-26T02:04:12.742Z",
+        "valueScore": 55,
+        "evidence": [
+          {
+            "url": "https://www.bilibili.com/video/BV1CCbBzBEG1/",
+            "type": "secondary",
+            "supports": "提供钟馗神话的民俗考据。",
+            "supportsEn": "Provides folklore research on Zhong Kui."
+          }
+        ]
+      }
+    }
+  ]
+}
