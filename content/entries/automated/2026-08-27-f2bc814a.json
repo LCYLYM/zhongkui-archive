@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "runDate": "2026-08-27",
+  "generatedAt": "2026-08-27T09:53:14.773Z",
+  "items": [
+    {
+      "id": "auto-fba64d7d31b2fc",
+      "type": "research",
+      "date": "2026.04.16",
+      "time": "08:00",
+      "source": "blackmyth.game Editorial Desk",
+      "platform": "文章",
+      "platformEn": "ARTICLE",
+      "title": "钟馗神话考据：典故、符号与民俗源流",
+      "titleEn": "Zhong Kui Mythology: Origins, Symbols, and Folk Customs",
+      "summary": "blackmyth.game 编辑部系统梳理钟馗在先秦“终葵”驱邪器物、受屈书生、幽冥判官、门神镇宅等层面的复合形象，并解释蝙蝠、剑、官袍、符箓等符号的文化含义。文章强调这些是理解游戏视觉与主题的参照系，不构成对游戏剧情、系统或发售日的确认。",
+      "summaryEn": "The blackmyth.game editorial desk systematically examines Zhong Kui's composite image across pre-Qin exorcism objects (Zhongkui), the wronged scholar, underworld judge, and door-god roles, explaining cultural meanings of bats, swords, official robes, and talismans. The article stresses these are reference frames for understanding the game's visuals and themes, not confirmations of plot, systems, or release dates.",
+      "audience": [
+        "zh"
+      ],
+      "evidence": "analysis",
+      "duration": "文章",
+      "durationEn": "article",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "钟馗",
+        "神话",
+        "民俗",
+        "驱鬼",
+        "道教",
+        "考据"
+      ],
+      "tagsEn": [
+        "Zhong Kui",
+        "mythology",
+        "folklore",
+        "ghost hunting",
+        "Taoism",
+        "research"
+      ],
+      "links": [
+        {
+          "label": "阅读原文",
+          "labelEn": "Read source",
+          "url": "https://blackmyth.game/zh-cn/posts/lore/zhong-kui-mythology/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://blackmyth.game/zh-cn/posts/lore/zhong-kui-mythology/",
+        "originalTitle": "钟馗神话考据:典故、符号与民俗源流",
+        "publishedAt": "2026-04-16T00:00:00.000Z",
+        "collectedAt": "2026-08-27T09:53:14.773Z",
+        "valueScore": 75,
+        "evidence": [
+          {
+            "url": "https://gamesci.cn/zhongkui/",
+            "type": "official",
+            "supports": "官网确认游戏取材于中国古代神话与民俗传说，为考据提供官方背景。",
+            "supportsEn": "Official site confirms the game draws from ancient Chinese mythology and folklore, providing official context for the research."
+          }
+        ]
+      }
+    }
+  ]
+}
