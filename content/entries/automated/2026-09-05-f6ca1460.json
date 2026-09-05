@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "runDate": "2026-09-05",
+  "generatedAt": "2026-09-05T10:59:25.385Z",
+  "items": [
+    {
+      "id": "auto-3ef7f37e6e1efd",
+      "type": "analysis",
+      "date": "2026.02.10",
+      "time": "08:00",
+      "source": "二指导玩游戏",
+      "platform": "BILIBILI",
+      "platformEn": "BILIBILI",
+      "title": "《黑神话钟馗》6分钟实机短片解析",
+      "titleEn": "Black Myth: Zhong Kui 6-Minute Gameplay Short Analysis",
+      "summary": "二指导玩游戏对《黑神话：钟馗》6分钟实机短片进行全细节解析，探讨预告中的隐藏细节和可能暗示。",
+      "summaryEn": "Er Zhidao analyzes the 6-minute gameplay short, exploring hidden details and possible hints.",
+      "audience": [
+        "zh"
+      ],
+      "evidence": "analysis",
+      "duration": "视频",
+      "durationEn": "Video",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "解析",
+        "细节",
+        "实机",
+        "预告"
+      ],
+      "tagsEn": [
+        "analysis",
+        "details",
+        "gameplay",
+        "trailer"
+      ],
+      "links": [
+        {
+          "label": "查看原视频",
+          "labelEn": "Watch source",
+          "url": "https://www.bilibili.com/video/BV1cEFSzsEMh/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://www.bilibili.com/video/BV1cEFSzsEMh/",
+        "originalTitle": "《黑神话钟馗》6分钟实机短片解析",
+        "publishedAt": "2026-02-10T00:00:00.000Z",
+        "collectedAt": "2026-09-05T10:59:25.385Z",
+        "valueScore": 55,
+        "evidence": [
+          {
+            "url": "https://www.bilibili.com/video/BV1cEFSzsEMh/",
+            "type": "primary",
+            "supports": "作者对短片的细节解析。",
+            "supportsEn": "Author's detailed analysis of the short."
+          }
+        ]
+      }
+    }
+  ]
+}
