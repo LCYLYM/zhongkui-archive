@@ -11,6 +11,7 @@
     "contextWindow": 280000,
     "maxTokens": 16384,
     "stream": true,
+    "thinking": false,
     "temperature": 0.2,
     "topP": 0.95
   },
@@ -29,6 +30,7 @@
     "maxCny": 10,
     "maxWallMinutes": 60,
     "maxModelMinutes": 30,
+    "maxModelAttempts": 3,
     "maxChangedFiles": 3
   },
   "contentPolicy": {

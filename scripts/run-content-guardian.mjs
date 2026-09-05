@@ -200,6 +200,7 @@ async function collectExaResearch({ config, sources, deadline }) {
     const text = flattenExternalText(response).join('\n').replace(/\u0000/g, '').trim();
     if (text.length < 40) throw new GuardianError('EXA_SEARCH_FAILED', 'an Exa search returned no usable evidence');
     results.push({ query, evidence: text.slice(0, config.limits.maxEvidenceCharsPerSearch) });
+    console.log(`research completed=${results.length}/${normalizedQueries.length}`);
   }
   return { searches: results.length, sha256: sha256(JSON.stringify(results)), results };
 }
@@ -217,7 +218,7 @@ function buildResearchBundle(research, videoContexts) {
   return `${sections.join('\n\n')}\n`;
 }
 
-async function runNvidiaModel({ config, prompt, credential, searches, startedAt, deadline }) {
+async function runNvidiaModel({ config, prompt, credential, searches, startedAt, deadline, spentCny = 0 }) {
   const controller = new AbortController();
   const modelDeadline = Math.min(deadline, Date.now() + config.limits.maxModelMinutes * 60_000);
   const timer = setTimeout(() => controller.abort(), Math.max(1, modelDeadline - Date.now()));
@@ -239,8 +240,9 @@ async function runNvidiaModel({ config, prompt, credential, searches, startedAt,
     estimatedCny: boundedCny,
     costBasis: 'configured-upper-bound',
   };
-  if (boundedCny > config.limits.maxCny) {
-    throw Object.assign(new GuardianError('BUDGET_EXHAUSTED', 'configured request upper bound exceeds the budget'), { evidence: baseEvidence });
+  if (spentCny + boundedCny > config.limits.maxCny) {
+    clearTimeout(timer);
+    throw Object.assign(new GuardianError('BUDGET_EXHAUSTED', 'configured request upper bound exceeds the budget'), { evidence: { ...baseEvidence, estimatedCny: 0 } });
   }
   try {
     const response = await fetch(`${config.model.baseUrl.replace(/\/$/, '')}/chat/completions`, {
@@ -260,10 +262,17 @@ async function runNvidiaModel({ config, prompt, credential, searches, startedAt,
         top_p: config.model.topP,
         max_tokens: config.model.maxTokens,
         stream: config.model.stream,
+        chat_template_kwargs: { thinking: config.model.thinking },
       }),
       signal: controller.signal,
     });
     responseText = await readLimitedText(response, 2_000_000, 'MODEL_PROTOCOL_FAILED');
+    Object.assign(baseEvidence, {
+      httpStatus: response.status,
+      durationMs: Date.now() - startedAt,
+      responseBytes: Buffer.byteLength(responseText, 'utf8'),
+      responseSha256: sha256(responseText),
+    });
     if (!response.ok) {
       throw Object.assign(
         new GuardianError(classifyNimHttpStatus(response.status), `NVIDIA NIM rejected the request with HTTP ${response.status}`),
@@ -304,8 +313,9 @@ async function runNvidiaModel({ config, prompt, credential, searches, startedAt,
     return { evidence, output: completion.output };
   } catch (error) {
     if (error?.name === 'AbortError') {
-      throw new GuardianError(Date.now() >= deadline ? 'TIME_LIMIT_EXCEEDED' : 'MODEL_TIMEOUT', 'NVIDIA NIM request timed out');
+      throw Object.assign(new GuardianError(Date.now() >= deadline ? 'TIME_LIMIT_EXCEEDED' : 'MODEL_TIMEOUT', 'NVIDIA NIM request timed out'), { evidence: { ...baseEvidence, durationMs: Date.now() - startedAt } });
     }
+    error.evidence ??= { ...baseEvidence, durationMs: Date.now() - startedAt };
     throw error;
   } finally {
     clearTimeout(timer);
@@ -389,14 +399,28 @@ try {
     if (Buffer.byteLength(prompt, 'utf8') > config.limits.maxPromptBytes) {
       throw new GuardianError('RESEARCH_BUNDLE_TOO_LARGE', 'bounded research prompt exceeded the configured limit');
     }
-    const modelResult = await runNvidiaModel({
-      config,
-      prompt,
-      credential,
-      searches: research.searches,
-      startedAt,
-      deadline,
-    });
+    let modelResult, spentCny = 0;
+    const failures = [], maxAttempts = Math.min(3, Math.max(1, config.limits.maxModelAttempts ?? 1));
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      console.log(`model attempt=${attempt}/${maxAttempts} searches=${research.searches} stream=${config.model.stream} thinking=${config.model.thinking}`);
+      try {
+        modelResult = await runNvidiaModel({ config, prompt, credential, searches: research.searches, startedAt, deadline, spentCny });
+        modelResult.evidence.estimatedCny = Number((spentCny + modelResult.evidence.estimatedCny).toFixed(6));
+        modelResult.evidence.modelAttempts = attempt;
+        modelResult.evidence.modelFailures = failures;
+        if (failures.length) modelResult.evidence.costBasis = 'completion-plus-retry-upper-bounds';
+        break;
+      } catch (error) {
+        spentCny = Number((spentCny + (error.evidence?.estimatedCny ?? 0)).toFixed(6));
+        failures.push({ attempt, code: error.code, httpStatus: error.evidence?.httpStatus ?? null });
+        error.evidence = { ...error.evidence, estimatedCny: spentCny, modelAttempts: attempt, modelFailures: [...failures] };
+        const retryable = ['MODEL_SERVICE_FAILED', 'MODEL_RATE_LIMITED', 'MODEL_TIMEOUT'].includes(error.code);
+        const delayMs = attempt * 10_000;
+        if (!retryable || attempt === maxAttempts || Date.now() + delayMs >= deadline) throw error;
+        console.log(`model retry code=${error.code} http_status=${error.evidence.httpStatus ?? 'none'} delay_ms=${delayMs}`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
     evidence = modelResult.evidence;
     evidence.researchSha256 = researchBundleSha256;
     if (gitStatus() !== '') throw new GuardianError('SOURCE_CHANGED_DURING_RUN', 'repository changed while the model request was running');
@@ -483,6 +507,8 @@ const report = {
     searches: evidence.searches,
     usage: evidence.usage,
     estimatedCny: evidence.estimatedCny,
+    modelAttempts: evidence.modelAttempts,
+    modelFailures: evidence.modelFailures,
   } : null,
 };
 await writeJsonAtomic(reportPath, report);
@@ -492,6 +518,7 @@ await setOutputs({
   input_fingerprint: inputFingerprint,
   searches: evidence?.searches ?? 0,
   estimated_cny: evidence?.estimatedCny ?? 0,
+  model_attempts: evidence?.modelAttempts ?? 0,
   blocker_code: blockerCode,
   http_status: evidence?.httpStatus ?? '',
 });

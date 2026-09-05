@@ -58,6 +58,7 @@ jobs:
           npm run privacy:check
           npm test
           npm run build
+          npm run site:validate
 
       - name: Prepare the independently verified content patch
         id: patch
@@ -96,10 +97,21 @@ jobs:
             echo "- 新增：${{ steps.curator.outputs.new_items || '0' }} 条"
             echo "- WebSearch：${{ steps.curator.outputs.searches || '0' }} / 200"
             echo "- 估算费用：${{ steps.curator.outputs.estimated_cny || '0' }} / 10 CNY"
+            echo "- 模型请求：${{ steps.curator.outputs.model_attempts || '0' }} / 3 次"
             echo "- 阻塞码：${{ steps.curator.outputs.blocker_code || '无' }}"
             echo "- HTTP 状态：${{ steps.curator.outputs.http_status || '无' }}"
             echo '- 原始模型响应、搜索全文和环境变量未上传。'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the sanitized content report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: content-report-${{ github.run_id }}
+          path: .automation/report.json
+          retention-days: 7
+          if-no-files-found: warn
+          include-hidden-files: true
 
   publish:
     needs: curate
@@ -126,6 +138,7 @@ jobs:
           git apply --index "$RUNNER_TEMP/verified-content/content.patch"
           git diff --cached --check
           npm ci
+          node scripts/verify-content-update.mjs
           npm run check
 
       - name: Publish one content-only commit
