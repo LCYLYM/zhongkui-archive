@@ -1,13 +1,17 @@
 import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import App from './App.jsx';
 import { I18nProvider } from './i18n.jsx';
 import './styles.css';
+import './experience.css';
 
-createRoot(document.getElementById('root')).render(
+const app = (
   <StrictMode>
     <I18nProvider>
       <App />
     </I18nProvider>
-  </StrictMode>,
+  </StrictMode>
 );
+const root = document.getElementById('root');
+if (root.dataset.rendered) hydrateRoot(root, app);
+else createRoot(root).render(app);

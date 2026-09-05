@@ -7,12 +7,13 @@ const milestones = [
   { year: '2026.08.20', title: '15 分钟实机演示', titleEn: '15-Minute Gameplay Demo', note: '首次展示主角战斗、HUD 与部分剧情片段，成为目前最重要的原始材料。', noteEn: 'The first extended look at protagonist combat, the HUD and selected story scenes; currently the most substantial primary source.', href: 'https://www.youtube.com/watch?v=oi2QgPH61JM' },
 ];
 
-export default function Origins() {
+export default function Origins({ embedded = false }) {
   const { locale, t } = useI18n();
+  const Heading = embedded ? 'h2' : 'h1';
   return (
-    <section className="section origins-section" id="origins" data-section="origins">
+    <section className="section origins-section" id="origins" data-section="origins" data-home-section={embedded ? 'origins' : undefined}>
       <div className="section-heading">
-        <div><h2>{t('origins.title')}</h2><p>{t('origins.subtitle')}</p></div>
+        <div><Heading>{t('origins.title')}</Heading><p>{t('origins.subtitle')}</p></div>
         <p className="section-index">{t('origins.index')}</p>
       </div>
       <div className="origin-rail">

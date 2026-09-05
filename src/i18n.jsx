@@ -82,7 +82,7 @@ const copy = {
     'dossiers.title': '人物志',
     'dossiers.subtitle': '目前公开画面中可辨认的角色与对象',
     'dossiers.index': '共 {count} 份档案',
-    'dossiers.confirmed': '已确认 {count}',
+    'dossiers.confirmed': '记录 {count}',
     'dossiers.pending': '待考 {count}',
     'dossiers.facts': '可复核记录',
     'dossiers.questions': '仍在雾中',
@@ -193,7 +193,7 @@ const copy = {
     'dossiers.title': 'Dossiers',
     'dossiers.subtitle': 'Characters and figures identifiable in public footage',
     'dossiers.index': '{count} ACTIVE FILES',
-    'dossiers.confirmed': 'Confirmed {count}',
+    'dossiers.confirmed': 'Records {count}',
     'dossiers.pending': 'Open {count}',
     'dossiers.facts': 'Checkable record',
     'dossiers.questions': 'Still unresolved',
@@ -230,20 +230,23 @@ const copy = {
 const I18nContext = createContext(null);
 
 function initialLocale() {
-  const stored = localStorage.getItem(LANGUAGE_KEY);
+  if (typeof window === 'undefined') return 'zh';
+  if (document.getElementById('root')?.dataset.rendered && location.pathname === '/') return document.documentElement.lang === 'en' ? 'en' : 'zh';
+  if (/^\/en(?:\/|$)/.test(location.pathname)) return 'en';
+  if (/^\/zh(?:\/|$)/.test(location.pathname)) return 'zh';
+  let stored;
+  try { stored = localStorage.getItem(LANGUAGE_KEY); } catch { return 'zh'; }
   return stored === 'en' ? 'en' : 'zh';
 }
 
-export function I18nProvider({ children }) {
-  const [locale, setLocale] = useState(initialLocale);
+export function I18nProvider({ children, initialLanguage }) {
+  const [locale, setLocale] = useState(() => initialLanguage ?? initialLocale());
 
   useEffect(() => {
-    localStorage.setItem(LANGUAGE_KEY, locale);
+    try { localStorage.setItem(LANGUAGE_KEY, locale); } catch { /* Locale remains available for this session. */ }
     document.documentElement.lang = locale === 'en' ? 'en' : 'zh-CN';
     document.documentElement.dataset.locale = locale;
-    document.title = locale === 'en'
-      ? 'Zhong Kui Archive | Black Myth: Zhong Kui'
-      : '钟馗志｜《黑神话：钟馗》资料站';
+
   }, [locale]);
 
   const value = useMemo(() => ({
@@ -267,7 +270,7 @@ export function useI18n() {
 
 export function localizeItem(item, locale) {
   const localizedLinks = item.links
-    .filter((link) => !Array.isArray(link.audience) || link.audience.includes(locale))
+    .toSorted((a, b) => Number(b.audience?.includes(locale) ?? false) - Number(a.audience?.includes(locale) ?? false))
     .map((link) => locale === 'en' ? { ...link, label: link.labelEn ?? link.label } : link);
   if (locale !== 'en') return { ...item, links: localizedLinks };
   return {

@@ -182,15 +182,15 @@ main { margin-left: var(--sidebar); }
 .origins-section blockquote cite { color: var(--dim); font: normal 10px var(--sans); letter-spacing: .14em; }
 
 .chapter-scroller { display: grid; grid-template-columns: repeat(8, minmax(100px, 1fr)); overflow-x: auto; padding-bottom: 28px; border-bottom: 1px solid var(--line-strong); }
-.chapter-scroller button { position: relative; min-width: 105px; padding: 0 12px 30px; border: 0; background: transparent; color: var(--muted); text-align: left; cursor: pointer; }
-.chapter-scroller button::after { content: ""; position: absolute; left: 0; right: 0; bottom: 5px; height: 1px; background: var(--line-strong); }
+.chapter-scroller :is(button,a) { position: relative; min-width: 105px; padding: 0 12px 30px; border: 0; background: transparent; color: var(--muted); text-align: left; cursor: pointer; }
+.chapter-scroller :is(button,a)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 5px; height: 1px; background: var(--line-strong); }
 .chapter-scroller time, .chapter-scroller strong, .chapter-scroller small { display: block; }
 .chapter-scroller time { color: var(--brass); font-size: 11px; }
 .chapter-scroller strong { margin-top: 8px; color: var(--paper); font-size: 15px; font-weight: 400; }
 .chapter-scroller small { position: absolute; top: 72px; color: var(--dim); font-size: 9px; }
 .chapter-scroller i { position: absolute; z-index: 1; left: 12px; bottom: 0; width: 11px; height: 11px; border: 1px solid var(--brass); border-radius: 50%; background: var(--ink); transition: background .2s, border-color .2s; }
-.chapter-scroller button.active time, .chapter-scroller button.active strong { color: var(--red-bright); }
-.chapter-scroller button.active i { background: var(--red); border-color: var(--red-bright); box-shadow: 0 0 0 5px rgba(157,48,43,.12); }
+.chapter-scroller :is(button,a).active time, .chapter-scroller :is(button,a).active strong { color: var(--red-bright); }
+.chapter-scroller :is(button,a).active i { background: var(--red); border-color: var(--red-bright); box-shadow: 0 0 0 5px rgba(157,48,43,.12); }
 .frame-detail { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(360px, .88fr); gap: 26px; margin-top: 42px; }
 .frame-media { position: relative; min-height: 475px; padding: 0; overflow: hidden; border: 1px solid var(--line-strong); background: #000; cursor: pointer; }
 .frame-media img { height: 100%; object-fit: cover; filter: saturate(.55) brightness(.64) contrast(1.12); transition: transform .8s, filter .8s; }

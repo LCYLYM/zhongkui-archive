@@ -1,0 +1,90 @@
+{
+  "source": {
+    "bytes": 83012020,
+    "sha256": "0b85315171b6bb1e205f8afd628f91fc65fd651923aeb56a0290b18bd9b2f518"
+  },
+  "variants": {
+    "balanced": {
+      "url": "/assets/models/white-swordsman-balanced.glb",
+      "bytes": 3485368,
+      "triangles": 138926,
+      "vertices": 125526,
+      "textures": [
+        {
+          "slots": [
+            "normalTexture"
+          ],
+          "width": 1024,
+          "height": 1024,
+          "bytes": 683856
+        },
+        {
+          "slots": [
+            "baseColorTexture"
+          ],
+          "width": 2048,
+          "height": 2048,
+          "bytes": 333932
+        },
+        {
+          "slots": [
+            "metallicRoughnessTexture"
+          ],
+          "width": 1024,
+          "height": 1024,
+          "bytes": 701494
+        }
+      ],
+      "estimatedTextureBytes": 33554431.999999996,
+      "config": {
+        "name": "balanced",
+        "ratio": 0.095,
+        "error": 0.0009,
+        "color": 2048,
+        "detail": 1024,
+        "quality": 86
+      }
+    },
+    "compact": {
+      "url": "/assets/models/white-swordsman-compact.glb",
+      "bytes": 1372116,
+      "triangles": 59958,
+      "vertices": 59069,
+      "textures": [
+        {
+          "slots": [
+            "normalTexture"
+          ],
+          "width": 512,
+          "height": 512,
+          "bytes": 181626
+        },
+        {
+          "slots": [
+            "baseColorTexture"
+          ],
+          "width": 1024,
+          "height": 1024,
+          "bytes": 111250
+        },
+        {
+          "slots": [
+            "metallicRoughnessTexture"
+          ],
+          "width": 512,
+          "height": 512,
+          "bytes": 229152
+        }
+      ],
+      "estimatedTextureBytes": 8388607.999999999,
+      "config": {
+        "name": "compact",
+        "ratio": 0.041,
+        "error": 0.002,
+        "color": 1024,
+        "detail": 512,
+        "quality": 82
+      }
+    }
+  }
+}

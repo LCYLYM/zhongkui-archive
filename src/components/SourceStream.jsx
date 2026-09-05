@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useI18n } from '../i18n.jsx';
+import { archivePath } from '../lib/archive.mjs';
 import { ArrowIcon, BookmarkIcon, PlayIcon } from './Icons.jsx';
 
 const filters = [
@@ -14,7 +15,7 @@ function EvidenceMark({ kind }) {
 }
 
 export default function SourceStream({ items, savedIds, onToggleSaved, onOpenItem }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [filter, setFilter] = useState('all');
   const filtered = useMemo(() => filter === 'all' ? items : items.filter((item) => item.type === filter), [filter, items]);
   const lead = filtered[0];
@@ -27,7 +28,7 @@ export default function SourceStream({ items, savedIds, onToggleSaved, onOpenIte
         <span>{t('stream.kicker')}</span>
       </div>
       <div className="section-heading">
-        <div><h2>{t('stream.title')}</h2><p>{t('stream.subtitle')}</p></div>
+        <div><h1>{t('stream.title')}</h1><p>{t('stream.subtitle')}</p></div>
         <p className="section-index">{t('stream.index')}</p>
       </div>
       <div className="filter-bar" role="tablist" aria-label={t('stream.filterLabel')}>
@@ -37,10 +38,10 @@ export default function SourceStream({ items, savedIds, onToggleSaved, onOpenIte
       </div>
       {lead ? (
         <article className="lead-story">
-          <button className="lead-image" onClick={() => onOpenItem(lead)} aria-label={t('a11y.openItem', { title: lead.title })}>
+          <a data-archive-link href={archivePath('source', lead.id, locale)} className="lead-image" aria-label={t('a11y.openItem', { title: lead.title })}>
             <img src={lead.image} alt="" />
-            <span><PlayIcon /></span>
-          </button>
+            <span>{/BILIBILI|YOUTUBE/.test(lead.platform) ? <PlayIcon /> : <ArrowIcon />}</span>
+          </a>
           <div className="lead-content">
             <EvidenceMark kind={lead.evidence} />
             <h3>{lead.title}</h3>
@@ -59,10 +60,10 @@ export default function SourceStream({ items, savedIds, onToggleSaved, onOpenIte
         {rest.map((item, index) => (
           <article className="story-row" key={item.id}>
             <time><b>{item.date.slice(5)}</b><span>{item.time}</span></time>
-            <button className="story-main" onClick={() => onOpenItem(item)}>
+            <a data-archive-link href={archivePath('source', item.id, locale)} className="story-main">
               <span className="story-number">{String(index + 2).padStart(2, '0')}</span>
               <span><small>{item.source} · {item.platform}</small><strong>{item.title}</strong></span>
-            </button>
+            </a>
             <EvidenceMark kind={item.evidence} />
             <button className={`bookmark ${savedIds.has(item.id) ? 'active' : ''}`} onClick={() => onToggleSaved(item.id)} aria-label={savedIds.has(item.id) ? t('a11y.unsave') : t('a11y.save')}>
               <BookmarkIcon filled={savedIds.has(item.id)} />
