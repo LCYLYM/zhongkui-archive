@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "runDate": "2026-09-05",
+  "generatedAt": "2026-09-05T10:47:50.930Z",
+  "items": [
+    {
+      "id": "auto-abebc47c280d1a",
+      "type": "analysis",
+      "date": "2026.08.21",
+      "time": "08:00",
+      "source": "blackmyth.game Editorial Desk",
+      "platform": "文章",
+      "platformEn": "ARTICLE",
+      "title": "黑神话：钟馗 15 分钟实机拆解",
+      "titleEn": "Black Myth: Zhong Kui 15-Minute Gameplay Breakdown",
+      "summary": "对8月20日官方实机演示的逐帧分析，包含八段时间轴、HUD出现时间、火入刃两阶段、大蚌真君全程，以及未确认清单。",
+      "summaryEn": "Frame-by-frame analysis of the Aug 20 official gameplay, including eight-segment timeline, HUD start, fire-enchant two phases, Da Bang Zhen Jun, and unconfirmed list.",
+      "audience": [
+        "zh"
+      ],
+      "evidence": "analysis",
+      "duration": "文章",
+      "durationEn": "Article",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "逐帧分析",
+        "实机拆解",
+        "大蚌真君",
+        "时间轴"
+      ],
+      "tagsEn": [
+        "frame-by-frame",
+        "breakdown",
+        "Da Bang Zhen Jun",
+        "timeline"
+      ],
+      "links": [
+        {
+          "label": "阅读原文",
+          "labelEn": "Read source",
+          "url": "https://blackmyth.game/zh-cn/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://blackmyth.game/zh-cn/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/",
+        "originalTitle": "黑神话：钟馗 15 分钟实机拆解",
+        "publishedAt": "2026-08-21T00:00:00.000Z",
+        "collectedAt": "2026-09-05T10:47:50.930Z",
+        "valueScore": 85,
+        "evidence": [
+          {
+            "url": "https://blackmyth.game/zh-cn/posts/analysis/black-myth-zhong-kui-gameplay-demo-breakdown/",
+            "type": "secondary",
+            "supports": "提供实机演示的详细逐帧分析。",
+            "supportsEn": "Provides detailed frame-by-frame analysis of the gameplay."
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-e4869caf3b94d0",
+      "type": "research",
+      "date": "2026.08.20",
+      "time": "08:00",
+      "source": "blackmyth.game Editorial Desk",
+      "platform": "文章",
+      "platformEn": "ARTICLE",
+      "title": "大蚌真君是谁？黑神话钟馗实机演示里的新头目",
+      "titleEn": "Who is Da Bang Zhen Jun? The New Boss in Black Myth: Zhong Kui",
+      "summary": "确认大蚌真君是实机演示后半段的BOSS，名字来自官方战斗界面血条。文章区分了官方确认信息与推测，并提供了蚌精民俗考据。",
+      "summaryEn": "Confirms Da Bang Zhen Jun as the boss in the latter half of the gameplay, name from official UI. Distinguishes confirmed info from speculation, with folklore research on clam spirits.",
+      "audience": [
+        "zh"
+      ],
+      "evidence": "analysis",
+      "duration": "文章",
+      "durationEn": "Article",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "大蚌真君",
+        "BOSS",
+        "人物考据",
+        "民俗"
+      ],
+      "tagsEn": [
+        "Da Bang Zhen Jun",
+        "boss",
+        "character research",
+        "folklore"
+      ],
+      "links": [
+        {
+          "label": "阅读原文",
+          "labelEn": "Read source",
+          "url": "https://blackmyth.game/zh-cn/posts/lore/who-is-da-bang-zhen-jun/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://blackmyth.game/zh-cn/posts/lore/who-is-da-bang-zhen-jun/",
+        "originalTitle": "大蚌真君是谁？黑神话钟馗实机演示里的新头目",
+        "publishedAt": "2026-08-20T00:00:00.000Z",
+        "collectedAt": "2026-09-05T10:47:50.930Z",
+        "valueScore": 80,
+        "evidence": [
+          {
+            "url": "https://blackmyth.game/zh-cn/posts/lore/who-is-da-bang-zhen-jun/",
+            "type": "secondary",
+            "supports": "确认大蚌真君名字来源，提供民俗考据。",
+            "supportsEn": "Confirms boss name source and provides folklore research."
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-1691b7f00fb19f",
+      "type": "overseas",
+      "date": "2026.08.19",
+      "time": "08:00",
+      "source": "IGN",
+      "platform": "媒体",
+      "platformEn": "MEDIA",
+      "title": "15分钟《黑神话：钟馗》实机演示充满令人印象深刻的细节",
+      "titleEn": "15-Minute Black Myth: Zhong Kui Gameplay Trailer Is Packed With Impressive Details",
+      "summary": "IGN报道了15分钟实机演示，强调新主角、战斗和世界细节，并引用官方描述。",
+      "summaryEn": "IGN reports on the 15-minute gameplay, highlighting new protagonist, combat, world details, and quotes official description.",
+      "audience": [
+        "en"
+      ],
+      "evidence": "analysis",
+      "duration": "文章",
+      "durationEn": "Article",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "IGN",
+        "报道",
+        "实机演示"
+      ],
+      "tagsEn": [
+        "IGN",
+        "report",
+        "gameplay"
+      ],
+      "links": [
+        {
+          "label": "阅读原文",
+          "labelEn": "Read source",
+          "url": "https://www.ign.com/articles/stunning-black-myth-zhong-kui-gameplay-trailer-gives-us-a-closer-look-at-the-new-protagonist-combat-and-a-truly-impressive-parry/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://www.ign.com/articles/stunning-black-myth-zhong-kui-gameplay-trailer-gives-us-a-closer-look-at-the-new-protagonist-combat-and-a-truly-impressive-parry/",
+        "originalTitle": "15-Minute Black Myth: Zhong Kui Gameplay Trailer Is Packed With Impressive Details",
+        "publishedAt": "2026-08-19T00:00:00.000Z",
+        "collectedAt": "2026-09-05T10:47:50.930Z",
+        "valueScore": 70,
+        "evidence": [
+          {
+            "url": "https://www.ign.com/articles/stunning-black-myth-zhong-kui-gameplay-trailer-gives-us-a-closer-look-at-the-new-protagonist-combat-and-a-truly-impressive-parry/",
+            "type": "secondary",
+            "supports": "提供海外媒体对实机演示的报道。",
+            "supportsEn": "Provides overseas media coverage of the gameplay."
+          }
+        ]
+      }
+    }
+  ]
+}
