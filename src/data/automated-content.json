@@ -331,6 +331,60 @@
     }
   },
   {
+    "id": "auto-bf039f350a457f",
+    "type": "overseas",
+    "date": "2026.08.20",
+    "time": "08:00",
+    "source": "LaytatoClips",
+    "platform": "YOUTUBE",
+    "platformEn": "YOUTUBE",
+    "title": "“绝对电影级！” | 《黑神话：钟馗》新实机演示反应",
+    "titleEn": "\"ABSOLUTE CINEMA!\" | Black Myth: Zhong Kui | New Gameplay Demo Reaction",
+    "summary": "LaytatoClips对15分钟实机演示的反应视频，称赞画面和战斗，提到格挡、完美闪避和处决等亮点。",
+    "summaryEn": "LaytatoClips' reaction to the 15-minute gameplay, praising visuals and combat, noting parries, perfect dodges, and executions.",
+    "audience": [
+      "en"
+    ],
+    "evidence": "reaction",
+    "duration": "视频",
+    "durationEn": "Video",
+    "image": "/assets/media/official-2026.jpg",
+    "tags": [
+      "反应",
+      "实机演示",
+      "战斗",
+      "处决"
+    ],
+    "tagsEn": [
+      "reaction",
+      "gameplay",
+      "combat",
+      "execution"
+    ],
+    "links": [
+      {
+        "label": "观看原片",
+        "labelEn": "Watch source",
+        "url": "https://www.youtube.com/watch?v=S-3c-rqfZho"
+      }
+    ],
+    "provenance": {
+      "canonicalUrl": "https://www.youtube.com/watch?v=S-3c-rqfZho",
+      "originalTitle": "\"ABSOLUTE CINEMA!\" | Black Myth: Zhong Kui | New Gameplay Demo Reaction",
+      "publishedAt": "2026-08-20T00:00:00.000Z",
+      "collectedAt": "2026-09-06T04:44:43.667Z",
+      "valueScore": 50,
+      "evidence": [
+        {
+          "url": "https://www.youtube.com/watch?v=S-3c-rqfZho",
+          "type": "secondary",
+          "supports": "作者对实机演示的反应和评论。",
+          "supportsEn": "Author's reaction and commentary on the gameplay."
+        }
+      ]
+    }
+  },
+  {
     "id": "auto-1691b7f00fb19f",
     "type": "overseas",
     "date": "2026.08.19",
