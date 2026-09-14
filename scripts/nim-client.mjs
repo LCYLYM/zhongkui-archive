@@ -16,7 +16,7 @@ export function normalizeNimUsage(usage) {
   const promptTokens = Number(usage?.prompt_tokens);
   const completionTokens = Number(usage?.completion_tokens);
   if (!Number.isFinite(promptTokens) || promptTokens < 0 || !Number.isFinite(completionTokens) || completionTokens < 0) {
-    throw Object.assign(new Error('NVIDIA NIM response did not include enforceable token usage'), { code: 'MODEL_USAGE_MISSING' });
+    throw Object.assign(new Error('Model API response did not include enforceable token usage'), { code: 'MODEL_USAGE_MISSING' });
   }
   const reasoningTokens = Number(usage?.completion_tokens_details?.reasoning_tokens ?? 0);
   const cacheReadTokens = Number(usage?.prompt_tokens_details?.cached_tokens ?? 0);
@@ -35,13 +35,13 @@ export function normalizeNimUsage(usage) {
 export function parseNimCompletion(payload, options = {}) {
   const choice = payload?.choices?.[0];
   if (!choice || typeof choice !== 'object') {
-    throw Object.assign(new Error('NVIDIA NIM response did not contain a completion choice'), { code: 'MODEL_PROTOCOL_FAILED' });
+    throw Object.assign(new Error('Model API response did not contain a completion choice'), { code: 'MODEL_PROTOCOL_FAILED' });
   }
   if (choice.finish_reason === 'length') {
-    throw Object.assign(new Error('NVIDIA NIM output reached the token cap'), { code: 'MODEL_OUTPUT_TRUNCATED' });
+    throw Object.assign(new Error('Model API output reached the token cap'), { code: 'MODEL_OUTPUT_TRUNCATED' });
   }
   if (choice.finish_reason && choice.finish_reason !== 'stop') {
-    throw Object.assign(new Error('NVIDIA NIM returned an unsupported finish reason'), { code: 'MODEL_PROTOCOL_FAILED' });
+    throw Object.assign(new Error('Model API returned an unsupported finish reason'), { code: 'MODEL_PROTOCOL_FAILED' });
   }
   const content = choice.message?.content;
   const output = typeof content === 'string'
@@ -50,7 +50,7 @@ export function parseNimCompletion(payload, options = {}) {
       ? content.filter(block => block?.type === 'text' && typeof block.text === 'string').map(block => block.text).join('')
       : '';
   if (!output.trim()) {
-    throw Object.assign(new Error('NVIDIA NIM returned no final text'), { code: 'MODEL_EMPTY_RESPONSE' });
+    throw Object.assign(new Error('Model API returned no final text'), { code: 'MODEL_EMPTY_RESPONSE' });
   }
   const usage = payload.usage
     ? normalizeNimUsage(payload.usage)
@@ -68,7 +68,7 @@ export function parseNimStream(text) {
     if (!data || data === '[DONE]') continue;
     let event;
     try { event = JSON.parse(data); }
-    catch { throw Object.assign(new Error('NVIDIA NIM stream contained invalid JSON'), { code: 'MODEL_PROTOCOL_FAILED' }); }
+    catch { throw Object.assign(new Error('Model API stream contained invalid JSON'), { code: 'MODEL_PROTOCOL_FAILED' }); }
     if (event.usage) usage = event.usage;
     const choice = event.choices?.[0];
     if (!choice) continue;
@@ -91,4 +91,32 @@ export function classifyNimHttpStatus(status) {
   if (status === 413) return 'MODEL_CONTEXT_LIMIT';
   if (status === 429) return 'MODEL_RATE_LIMITED';
   return status >= 500 ? 'MODEL_SERVICE_FAILED' : 'MODEL_REQUEST_REJECTED';
+}
+
+// Fetch wraps transport failures in TypeError.cause; preserve only known safe codes.
+export function classifyModelTransportError(error) {
+  const code = error?.cause?.code ?? error?.code;
+  if (error?.name === 'AbortError' || error?.name === 'TimeoutError' ||
+      ['UND_ERR_HEADERS_TIMEOUT', 'UND_ERR_BODY_TIMEOUT', 'UND_ERR_CONNECT_TIMEOUT', 'ETIMEDOUT'].includes(code)) {
+    return { code: 'MODEL_TIMEOUT', transportCode: code?.match(/^[A-Z_]+$/)?.[0] ?? error.name };
+  }
+  if (['ECONNRESET', 'ECONNREFUSED', 'EPIPE', 'ENOTFOUND', 'EAI_AGAIN', 'UND_ERR_SOCKET'].includes(code)) {
+    return { code: 'MODEL_NETWORK_FAILED', transportCode: code };
+  }
+  return null;
+}
+
+export function buildModelRequest(model, prompt) {
+  return {
+    model: model.id,
+    messages: [
+      { role: 'system', content: 'Return only the requested JSON object. Do not include hidden reasoning, Markdown or commentary.' },
+      { role: 'user', content: prompt },
+    ],
+    temperature: model.temperature,
+    top_p: model.topP,
+    max_tokens: model.maxTokens,
+    stream: model.stream,
+    reasoning_effort: model.reasoningEffort,
+  };
 }

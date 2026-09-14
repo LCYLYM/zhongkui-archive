@@ -40,10 +40,11 @@ jobs:
       - name: Install website dependencies
         run: npm ci
 
-      - name: Run bounded Exa research and NVIDIA synthesis
+      - name: Run bounded Exa research and model synthesis
         id: curator
         env:
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          MODEL_API_KEY: ${{ secrets.MODEL_API_KEY }}
+          MODEL_BASE_URL: ${{ secrets.MODEL_BASE_URL }}
           GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: node scripts/run-content-guardian.mjs
 

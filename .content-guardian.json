@@ -5,15 +5,13 @@
     "cron": "17 8 * * *"
   },
   "model": {
-    "provider": "nvidia-nim",
-    "id": "deepseek-ai/deepseek-v4-flash-0731",
-    "baseUrl": "https://integrate.api.nvidia.com/v1",
-    "contextWindow": 280000,
+    "provider": "openai-compatible",
+    "id": "qwen3.8-flash",
     "maxTokens": 16384,
     "stream": true,
-    "thinking": false,
     "temperature": 0.2,
-    "topP": 0.95
+    "topP": 0.95,
+    "reasoningEffort": "max"
   },
   "search": {
     "exaMcpUrl": "https://mcp.exa.ai/mcp"

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { estimateCny } from './content-budget.mjs';
 import { applyVideoAudiencePolicy, canonicalizeUrl, toSiteItem, validateDraftCandidates } from './content-schema.mjs';
-import { classifyNimHttpStatus, parseModelDraftOutput, parseNimCompletion, parseNimStream } from './nim-client.mjs';
+import { buildModelRequest, classifyModelTransportError, classifyNimHttpStatus, parseModelDraftOutput, parseNimCompletion, parseNimStream } from './nim-client.mjs';
 import { collectVideoContexts } from './video-context.mjs';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -218,14 +218,14 @@ function buildResearchBundle(research, videoContexts) {
   return `${sections.join('\n\n')}\n`;
 }
 
-async function runNvidiaModel({ config, prompt, credential, searches, startedAt, deadline, spentCny = 0 }) {
+async function runModel({ config, prompt, credential, searches, startedAt, deadline, spentCny = 0 }) {
   const controller = new AbortController();
   const modelDeadline = Math.min(deadline, Date.now() + config.limits.maxModelMinutes * 60_000);
   const timer = setTimeout(() => controller.abort(), Math.max(1, modelDeadline - Date.now()));
   let responseText = '';
   const promptBytes = Buffer.byteLength(prompt, 'utf8');
   const boundedUsage = {
-    inputTokens: Math.min(promptBytes, config.model.contextWindow - config.model.maxTokens),
+    inputTokens: promptBytes,
     outputTokens: config.model.maxTokens,
     cacheReadTokens: 0,
     cacheWriteTokens: 0,
@@ -245,28 +245,18 @@ async function runNvidiaModel({ config, prompt, credential, searches, startedAt,
     throw Object.assign(new GuardianError('BUDGET_EXHAUSTED', 'configured request upper bound exceeds the budget'), { evidence: { ...baseEvidence, estimatedCny: 0 } });
   }
   try {
-    const response = await fetch(`${config.model.baseUrl.replace(/\/$/, '')}/chat/completions`, {
+    const response = await fetch(`${process.env.MODEL_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
       method: 'POST',
       headers: {
         authorization: `Bearer ${credential}`,
         accept: config.model.stream ? 'text/event-stream' : 'application/json',
         'content-type': 'application/json',
       },
-      body: JSON.stringify({
-        model: config.model.id,
-        messages: [
-          { role: 'system', content: 'Return only the requested JSON object. Do not include hidden reasoning, Markdown or commentary.' },
-          { role: 'user', content: prompt },
-        ],
-        temperature: config.model.temperature,
-        top_p: config.model.topP,
-        max_tokens: config.model.maxTokens,
-        stream: config.model.stream,
-        chat_template_kwargs: { thinking: config.model.thinking },
-      }),
+      body: JSON.stringify(buildModelRequest(config.model, prompt)),
       signal: controller.signal,
     });
-    responseText = await readLimitedText(response, 2_000_000, 'MODEL_PROTOCOL_FAILED');
+    baseEvidence.httpStatus = response.status;
+    responseText = await readLimitedText(response, 8_000_000, 'MODEL_PROTOCOL_FAILED');
     Object.assign(baseEvidence, {
       httpStatus: response.status,
       durationMs: Date.now() - startedAt,
@@ -275,7 +265,7 @@ async function runNvidiaModel({ config, prompt, credential, searches, startedAt,
     });
     if (!response.ok) {
       throw Object.assign(
-        new GuardianError(classifyNimHttpStatus(response.status), `NVIDIA NIM rejected the request with HTTP ${response.status}`),
+        new GuardianError(classifyNimHttpStatus(response.status), `Model API rejected the request with HTTP ${response.status}`),
         { evidence: {
           ...baseEvidence,
           httpStatus: response.status,
@@ -287,7 +277,7 @@ async function runNvidiaModel({ config, prompt, credential, searches, startedAt,
     }
     let payload;
     try { payload = config.model.stream ? parseNimStream(responseText) : JSON.parse(responseText); }
-    catch { throw new GuardianError('MODEL_PROTOCOL_FAILED', 'NVIDIA NIM returned invalid JSON'); }
+    catch { throw new GuardianError('MODEL_PROTOCOL_FAILED', 'Model API returned invalid JSON'); }
     let completion;
     try { completion = parseNimCompletion(payload, { allowMissingUsage: config.model.stream }); }
     catch (error) { throw new GuardianError(error.code ?? 'MODEL_PROTOCOL_FAILED', error.message); }
@@ -312,8 +302,9 @@ async function runNvidiaModel({ config, prompt, credential, searches, startedAt,
     }
     return { evidence, output: completion.output };
   } catch (error) {
-    if (error?.name === 'AbortError') {
-      throw Object.assign(new GuardianError(Date.now() >= deadline ? 'TIME_LIMIT_EXCEEDED' : 'MODEL_TIMEOUT', 'NVIDIA NIM request timed out'), { evidence: { ...baseEvidence, durationMs: Date.now() - startedAt } });
+    const transport = classifyModelTransportError(error);
+    if (transport) {
+      throw Object.assign(new GuardianError(Date.now() >= deadline ? 'TIME_LIMIT_EXCEEDED' : transport.code, 'Model API transport failed'), { evidence: { ...baseEvidence, transportCode: transport.transportCode, durationMs: Date.now() - startedAt } });
     }
     error.evidence ??= { ...baseEvidence, durationMs: Date.now() - startedAt };
     throw error;
@@ -340,11 +331,13 @@ function publicBlocker(error) {
     BUDGET_EXHAUSTED: '估算费用达到上限，未发布本轮内容。',
     TIME_LIMIT_EXCEEDED: '运行达到一小时上限，未发布本轮内容。',
     MODEL_TIMEOUT: '模型响应超时，未发布本轮内容。',
+    MODEL_NETWORK_FAILED: '模型连接中断，未发布本轮内容。',
+    MODEL_ENDPOINT_MISSING: '缺少有效的 HTTPS 模型接口配置。',
     MODEL_RATE_LIMITED: '模型服务触发限流，未发布本轮内容。',
     MODEL_AUTH_FAILED: '模型服务拒绝凭据，未发布本轮内容。',
     MODEL_CONTEXT_LIMIT: '模型请求超过上下文或载荷限制，未发布本轮内容。',
-    MODEL_SERVICE_FAILED: 'NVIDIA 模型服务暂时失败，未发布本轮内容。',
-    MODEL_REQUEST_REJECTED: 'NVIDIA 模型服务拒绝了请求，未发布本轮内容。',
+    MODEL_SERVICE_FAILED: '模型服务暂时失败，未发布本轮内容。',
+    MODEL_REQUEST_REJECTED: '模型服务拒绝了请求，未发布本轮内容。',
     MODEL_PROTOCOL_FAILED: '模型响应格式异常，未发布本轮内容。',
     MODEL_USAGE_MISSING: '模型响应缺少可核验用量，费用门无法执行，未发布内容。',
     MODEL_OUTPUT_TRUNCATED: '模型输出达到上限，草稿不完整，未发布内容。',
@@ -377,8 +370,9 @@ try {
   if (state.lastInputFingerprint === inputFingerprint && trigger !== 'workflow_dispatch') {
     status = 'NOOP';
   } else {
-    const credential = process.env.NVIDIA_API_KEY;
-    if (!credential) throw new GuardianError('MODEL_CREDENTIAL_MISSING', 'NVIDIA_API_KEY is not configured');
+    const credential = process.env.MODEL_API_KEY;
+    if (!credential) throw new GuardianError('MODEL_CREDENTIAL_MISSING', 'MODEL_API_KEY is not configured');
+    if (!process.env.MODEL_BASE_URL?.startsWith('https://')) throw new GuardianError('MODEL_ENDPOINT_MISSING', 'MODEL_BASE_URL is not configured');
     if (gitStatus() !== '') throw new GuardianError('DIRTY_SOURCE', 'content guardian requires a clean checkout');
     const research = await collectExaResearch({ config, sources, deadline });
     const videoContexts = await collectVideoContexts(research.results, {
@@ -402,9 +396,9 @@ try {
     let modelResult, spentCny = 0;
     const failures = [], maxAttempts = Math.min(3, Math.max(1, config.limits.maxModelAttempts ?? 1));
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      console.log(`model attempt=${attempt}/${maxAttempts} searches=${research.searches} stream=${config.model.stream} thinking=${config.model.thinking}`);
+      console.log(`model attempt=${attempt}/${maxAttempts} searches=${research.searches} stream=${config.model.stream} reasoning_effort=${config.model.reasoningEffort} model=${config.model.id}`);
       try {
-        modelResult = await runNvidiaModel({ config, prompt, credential, searches: research.searches, startedAt, deadline, spentCny });
+        modelResult = await runModel({ config, prompt, credential, searches: research.searches, startedAt, deadline, spentCny });
         modelResult.evidence.estimatedCny = Number((spentCny + modelResult.evidence.estimatedCny).toFixed(6));
         modelResult.evidence.modelAttempts = attempt;
         modelResult.evidence.modelFailures = failures;
@@ -412,9 +406,9 @@ try {
         break;
       } catch (error) {
         spentCny = Number((spentCny + (error.evidence?.estimatedCny ?? 0)).toFixed(6));
-        failures.push({ attempt, code: error.code, httpStatus: error.evidence?.httpStatus ?? null });
+        failures.push({ attempt, code: error.code ?? 'CONTENT_GUARDIAN_FAILED', httpStatus: error.evidence?.httpStatus ?? null, transportCode: error.evidence?.transportCode ?? null });
         error.evidence = { ...error.evidence, estimatedCny: spentCny, modelAttempts: attempt, modelFailures: [...failures] };
-        const retryable = ['MODEL_SERVICE_FAILED', 'MODEL_RATE_LIMITED', 'MODEL_TIMEOUT'].includes(error.code);
+        const retryable = ['MODEL_SERVICE_FAILED', 'MODEL_RATE_LIMITED', 'MODEL_TIMEOUT', 'MODEL_NETWORK_FAILED'].includes(error.code);
         const delayMs = attempt * 10_000;
         if (!retryable || attempt === maxAttempts || Date.now() + delayMs >= deadline) throw error;
         console.log(`model retry code=${error.code} http_status=${error.evidence.httpStatus ?? 'none'} delay_ms=${delayMs}`);
@@ -491,10 +485,13 @@ const report = {
   runDate,
   inputFingerprint,
   newItems,
+  blockerCode,
   limits: config.limits,
   evidence: evidence ? {
     provider: evidence.provider,
     model: evidence.model,
+    reasoningEffort: config.model.reasoningEffort,
+    transportCode: evidence.transportCode,
     durationMs: evidence.durationMs,
     responseBytes: evidence.responseBytes,
     responseSha256: evidence.responseSha256,
