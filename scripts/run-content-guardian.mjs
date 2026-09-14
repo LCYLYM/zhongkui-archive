@@ -158,6 +158,7 @@ async function callExa(config, query, deadline, requestId) {
   const controller = new AbortController();
   const timeoutMs = Math.min(60_000, Math.max(1, deadline - Date.now()));
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const evidence = { phase: 'search', searchIndex: requestId, searches: requestId - 1, estimatedCny: 0 };
   try {
     const response = await fetch(config.search.exaMcpUrl, {
       method: 'POST',
@@ -173,14 +174,22 @@ async function callExa(config, query, deadline, requestId) {
       }),
       signal: controller.signal,
     });
-    if (!response.ok) throw new Error('Exa HTTP request failed');
+    evidence.httpStatus = response.status;
+    if (!response.ok) throw new GuardianError('EXA_SEARCH_FAILED', 'Exa HTTP request failed');
     const payload = parseMcpPayload(await readLimitedText(response));
-    if (payload.error || payload.result?.isError) throw new Error('Exa MCP returned an error');
+    if (payload.error || payload.result?.isError) {
+      evidence.searchFailure = 'MCP_ERROR';
+      const errorText = JSON.stringify(payload.error ?? payload.result);
+      evidence.responseSha256 = sha256(errorText);
+      if (/rate.?limit|too many requests|quota/i.test(errorText)) evidence.searchFailure = 'RATE_LIMITED';
+      if (/access denied|forbidden|blocked/i.test(errorText)) evidence.searchFailure = 'ACCESS_DENIED';
+      throw new GuardianError('EXA_SEARCH_FAILED', 'Exa MCP returned an error');
+    }
     return payload.result;
   } catch (error) {
     if (Date.now() >= deadline) throw new GuardianError('TIME_LIMIT_EXCEEDED', 'content research reached its overall deadline');
-    if (error?.code === 'EXA_SEARCH_FAILED') throw error;
-    throw new GuardianError('EXA_SEARCH_FAILED', 'the deterministic Exa research stage failed');
+    const transport = classifyModelTransportError(error);
+    throw Object.assign(new GuardianError('EXA_SEARCH_FAILED', 'the deterministic Exa research stage failed'), { evidence: { ...evidence, transportCode: transport?.transportCode } });
   } finally {
     clearTimeout(timer);
   }
@@ -198,7 +207,7 @@ async function collectExaResearch({ config, sources, deadline }) {
     if (Date.now() >= deadline) throw new GuardianError('TIME_LIMIT_EXCEEDED', 'content research reached its overall deadline');
     const response = await callExa(config, query, deadline, index + 1);
     const text = flattenExternalText(response).join('\n').replace(/\u0000/g, '').trim();
-    if (text.length < 40) throw new GuardianError('EXA_SEARCH_FAILED', 'an Exa search returned no usable evidence');
+    if (text.length < 40) throw Object.assign(new GuardianError('EXA_SEARCH_FAILED', 'an Exa search returned no usable evidence'), { evidence: { phase: 'search', searchIndex: index + 1, searches: results.length, searchFailure: 'EMPTY_EVIDENCE', estimatedCny: 0 } });
     results.push({ query, evidence: text.slice(0, config.limits.maxEvidenceCharsPerSearch) });
     console.log(`research completed=${results.length}/${normalizedQueries.length}`);
   }
@@ -488,6 +497,9 @@ const report = {
   blockerCode,
   limits: config.limits,
   evidence: evidence ? {
+    phase: evidence.phase,
+    searchIndex: evidence.searchIndex,
+    searchFailure: evidence.searchFailure,
     provider: evidence.provider,
     model: evidence.model,
     reasoningEffort: config.model.reasoningEffort,
