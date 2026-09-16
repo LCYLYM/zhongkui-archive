@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "runDate": "2026-09-16",
+  "generatedAt": "2026-09-16T04:53:24.336Z",
+  "items": [
+    {
+      "id": "auto-721d818f29d79b",
+      "type": "overseas",
+      "date": "2026.08.20",
+      "time": "08:00",
+      "source": "IGN Middle East",
+      "platform": "媒体",
+      "platformEn": "MEDIA",
+      "title": "IGN中东页面：《黑神话：钟馗》官方15分钟实机预告片",
+      "titleEn": "IGN Middle East: Black Myth: Zhong Kui Official Gameplay Trailer",
+      "summary": "IGN Middle East页面收录并嵌入《黑神话：钟馗》15分钟实机预告片，属于海外媒体转载的官方预告片页面。页面转述游戏科学发布说明：该预告片为黑神话系列第二部作品，首次展示主角战斗与部分剧情片段；画面来自开发中版本，运行时按21:9宽高比录制，最终发售内容可能不同。",
+      "summaryEn": "IGN Middle East page hosts and embeds the 15-minute Black Myth: Zhong Kui gameplay trailer as a secondary media copy of the official trailer. It relays Game Science's note that the trailer is for the second title in the Black Myth series, shows the protagonist in combat and story snippets, and was captured from a work-in-progress build at a 21:9 aspect ratio, with final content subject to change.",
+      "audience": [
+        "en"
+      ],
+      "evidence": "confirmed",
+      "duration": "15分钟预告片页面",
+      "durationEn": "15-minute trailer page",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "黑神话：钟馗",
+        "官方预告片",
+        "实机演示",
+        "游戏科学",
+        "开发中版本",
+        "海外媒体"
+      ],
+      "tagsEn": [
+        "Black Myth: Zhong Kui",
+        "official trailer",
+        "gameplay",
+        "Game Science",
+        "work-in-progress",
+        "overseas media"
+      ],
+      "links": [
+        {
+          "label": "阅读原文",
+          "labelEn": "Read source",
+          "url": "https://me.ign.com/en/black-myth-zhong-kui/247293/black-myth-zhong-kui-official-gameplay-trailer/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://me.ign.com/en/black-myth-zhong-kui/247293/black-myth-zhong-kui-official-gameplay-trailer/",
+        "originalTitle": "Black Myth: Zhong Kui - Official Gameplay Trailer",
+        "publishedAt": "2026-08-20T00:00:00.000Z",
+        "collectedAt": "2026-09-16T04:53:24.336Z",
+        "valueScore": 70,
+        "evidence": [
+          {
+            "url": "https://www.bilibili.com/video/BV1kS8H6VERt/",
+            "type": "official",
+            "supports": "官方B站发布15分钟实机演示，并说明开发中版本、21:9宽高比和最终内容可能不同。",
+            "supportsEn": "Official Bilibili release of the 15-minute gameplay demo with the work-in-progress, 21:9, and final-content-may-differ notes."
+          },
+          {
+            "url": "https://www.youtube.com/watch?v=oi2QgPH61JM",
+            "type": "official",
+            "supports": "官方YouTube频道发布同一15分钟预告片，作者为Black Myth。",
+            "supportsEn": "Official Black Myth YouTube channel published the same 15-minute gameplay trailer."
+          },
+          {
+            "url": "https://gamesci.cn/zhongkui/",
+            "type": "official",
+            "supports": "官网确认《黑神话：钟馗》为黑神话系列新作。",
+            "supportsEn": "Official site confirms Black Myth: Zhong Kui as a new entry in the Black Myth series."
+          }
+        ]
+      }
+    }
+  ]
+}
