@@ -30,7 +30,7 @@
     "maxModelMinutes": 10,
     "maxModelAttempts": 5,
     "maxChangedFiles": 3,
-    "maxModelAttemptSeconds": 100
+    "maxModelIdleSeconds": 100
   },
   "contentPolicy": {
     "videoPrimaryToCrossRatio": 2,

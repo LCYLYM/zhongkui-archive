@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { requestModelWithRetry } from '../scripts/model-retry.mjs';
 
-const limits = { maxModelMinutes: 10, maxModelAttempts: 5, maxModelAttemptSeconds: 100 };
+const limits = { maxModelMinutes: 10, maxModelAttempts: 5, maxModelIdleSeconds: 100 };
 const failure = code => Object.assign(new Error('synthetic model failure'), { code, evidence: { estimatedCny: 0.1 } });
 const result = () => ({ output: '{}', evidence: { estimatedCny: 0.1 } });
 
@@ -19,7 +19,7 @@ test('four slow transient failures recover on attempt five within one ten-minute
   const answer = await requestModelWithRetry({ ...timer, limits, deadline: 3_600_000, request: async input => {
     attempts.push(input);
     assert.equal(input.deadline, 600_000);
-    assert.equal(input.attemptDeadline - timer.now(), 100_000);
+    assert.equal(input.idleTimeoutMs, 100_000);
     assert.equal(input.spentCny, (input.attempt - 1) / 10);
     timer.advance(100_000);
     if (input.attempt < 5) throw failure(codes[input.attempt - 1]);
@@ -46,8 +46,8 @@ test('earlier overall deadline shortens the next request and prevents another ba
   const timer = clock();
   const deadlines = [];
   await assert.rejects(requestModelWithRetry({ ...timer, limits, deadline: 180_000, request: async input => {
-    deadlines.push(input.attemptDeadline);
-    timer.advance(input.attemptDeadline - timer.now());
+    deadlines.push(timer.now() + input.idleTimeoutMs);
+    timer.advance(input.idleTimeoutMs);
     throw failure('MODEL_TIMEOUT');
   } }), e => e.code === 'MODEL_TIMEOUT' && e.evidence.modelAttempts === 2);
   assert.deepEqual(deadlines, [100_000, 180_000]);
@@ -68,10 +68,35 @@ test('authentication, rejected requests and budget exhaustion stop immediately',
   }
 });
 
-test('a result returned beyond its attempt deadline cannot become a successful completion', async () => {
+test('a result returned beyond the shared deadline cannot become a successful completion', async () => {
   const timer = clock();
   await assert.rejects(requestModelWithRetry({ ...timer, limits: { ...limits, maxModelAttempts: 1 }, deadline: 600_000, request: async () => {
-    timer.advance(100_001);
+    timer.advance(600_001);
     return result();
   } }), { code: 'MODEL_TIMEOUT' });
+});
+
+
+test('an active slow stream may finish after 100 seconds within the shared deadline', async () => {
+  const timer = clock();
+  const answer = await requestModelWithRetry({ ...timer, limits, deadline: 600_000, request: async () => {
+    timer.advance(150_000);
+    return result();
+  } });
+  assert.equal(answer.evidence.modelAttempts, 1);
+  assert.equal(answer.evidence.modelRetryDurationMs, 150_000);
+});
+
+
+test('truncated or malformed model output can recover without accepting the failed draft', async () => {
+  for (const code of ['MODEL_OUTPUT_TRUNCATED', 'DRAFT_OUTPUT_INVALID']) {
+    const timer = clock();
+    const answer = await requestModelWithRetry({ ...timer, limits, deadline: 600_000, request: async ({ attempt }) => {
+      if (attempt === 1) throw failure(code);
+      return result();
+    } });
+    assert.equal(answer.evidence.modelAttempts, 2);
+    assert.equal(answer.evidence.modelFailures[0].code, code);
+    assert.equal(answer.evidence.estimatedCny, 0.2);
+  }
 });

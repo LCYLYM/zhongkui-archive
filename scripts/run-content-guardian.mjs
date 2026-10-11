@@ -4,6 +4,7 @@ import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { modelTimeout } from './model-timeout.mjs';
 import { requestSearchWithRetry, retryAfterMs } from './search-retry.mjs';
 import { requestModelWithRetry } from './model-retry.mjs';
 import { estimateCny } from './content-budget.mjs';
@@ -120,7 +121,7 @@ function flattenExternalText(value, output = []) {
   return output;
 }
 
-async function readLimitedText(response, maxBytes = 2_000_000, errorCode = 'EXA_SEARCH_FAILED') {
+async function readLimitedText(response, maxBytes = 2_000_000, errorCode = 'EXA_SEARCH_FAILED', onChunk = () => {}) {
   const reader = response.body?.getReader();
   if (!reader) return '';
   const chunks = [];
@@ -129,6 +130,7 @@ async function readLimitedText(response, maxBytes = 2_000_000, errorCode = 'EXA_
     const { done, value } = await reader.read();
     if (done) break;
     bytes += value.byteLength;
+    onChunk(value.byteLength);
     if (bytes > maxBytes) {
       await reader.cancel();
       throw new GuardianError(errorCode, 'upstream returned an unexpectedly large response');
@@ -245,10 +247,8 @@ function buildResearchBundle(research, videoContexts) {
   return `${sections.join('\n\n')}\n`;
 }
 
-async function runModel({ config, prompt, credential, searches, searchRequests, startedAt, deadline, attemptDeadline, spentCny = 0 }) {
-  const controller = new AbortController();
-  const modelDeadline = Math.min(deadline, attemptDeadline);
-  const timer = setTimeout(() => controller.abort(), Math.max(1, modelDeadline - Date.now()));
+async function runModel({ config, prompt, credential, searches, searchRequests, startedAt, deadline, idleTimeoutMs, spentCny = 0 }) {
+  const timeout = modelTimeout({ deadline, idleMs: idleTimeoutMs });
   let responseText = '';
   const promptBytes = Buffer.byteLength(prompt, 'utf8');
   const boundedUsage = {
@@ -269,7 +269,7 @@ async function runModel({ config, prompt, credential, searches, searchRequests, 
     costBasis: 'configured-upper-bound',
   };
   if (spentCny + boundedCny > config.limits.maxCny) {
-    clearTimeout(timer);
+    timeout.dispose();
     throw Object.assign(new GuardianError('BUDGET_EXHAUSTED', 'configured request upper bound exceeds the budget'), { evidence: { ...baseEvidence, estimatedCny: 0 } });
   }
   try {
@@ -281,11 +281,16 @@ async function runModel({ config, prompt, credential, searches, searchRequests, 
         'content-type': 'application/json',
       },
       body: JSON.stringify(buildModelRequest(config.model, prompt)),
-      signal: controller.signal,
+      signal: timeout.signal,
     });
+    timeout.refresh();
     baseEvidence.httpStatus = response.status;
     baseEvidence.responseContentType = response.headers.get('content-type')?.split(';')[0]?.slice(0,100) ?? null;
-    responseText = await readLimitedText(response, 8_000_000, 'MODEL_PROTOCOL_FAILED');
+    baseEvidence.responseBytes = 0;
+    responseText = await readLimitedText(response, 8_000_000, 'MODEL_PROTOCOL_FAILED', bytes => {
+      baseEvidence.responseBytes += bytes;
+      timeout.refresh();
+    });
     Object.assign(baseEvidence, {
       httpStatus: response.status,
       durationMs: Date.now() - startedAt,
@@ -339,7 +344,7 @@ async function runModel({ config, prompt, credential, searches, searchRequests, 
     error.evidence ??= { ...baseEvidence, durationMs: Date.now() - startedAt };
     throw error;
   } finally {
-    clearTimeout(timer);
+    timeout.dispose();
   }
 }
 
@@ -429,17 +434,20 @@ try {
     const modelResult = await requestModelWithRetry({
       limits: config.limits,
       deadline,
-      request: ({ attemptDeadline, deadline: modelDeadline, spentCny }) => runModel({
-        config, prompt, credential, searches: research.searches, searchRequests: research.searchRequests, startedAt,
-        deadline: modelDeadline, attemptDeadline, spentCny,
-      }),
+      request: async ({ idleTimeoutMs, deadline: modelDeadline, spentCny }) => {
+        const result = await runModel({
+          config, prompt, credential, searches: research.searches, searchRequests: research.searchRequests, startedAt,
+          deadline: modelDeadline, idleTimeoutMs, spentCny,
+        });
+        try { result.rawDraft = parseModelDraftOutput(result.output); }
+        catch { throw Object.assign(new GuardianError('DRAFT_OUTPUT_INVALID', 'Model final text is not a valid JSON draft'), { evidence: result.evidence }); }
+        return result;
+      },
     });
     evidence = modelResult.evidence;
     evidence.researchSha256 = researchBundleSha256;
     if (gitStatus() !== '') throw new GuardianError('SOURCE_CHANGED_DURING_RUN', 'repository changed while the model request was running');
-    let rawDraft;
-    try { rawDraft = parseModelDraftOutput(modelResult.output); }
-    catch (error) { throw Object.assign(new GuardianError('DRAFT_OUTPUT_INVALID', error.message), { evidence }); }
+    const rawDraft = modelResult.rawDraft;
     let draft;
     try {
       const result = validateDraftCandidates(rawDraft, { maxItems: config.limits.maxNewItems });
