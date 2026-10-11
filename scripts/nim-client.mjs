@@ -133,7 +133,7 @@ export function classifyModelTransportError(error) {
   const code = error?.cause?.code ?? error?.code;
   if (error?.name === 'AbortError' || error?.name === 'TimeoutError' ||
       ['UND_ERR_HEADERS_TIMEOUT', 'UND_ERR_BODY_TIMEOUT', 'UND_ERR_CONNECT_TIMEOUT', 'ETIMEDOUT'].includes(code)) {
-    return { code: 'MODEL_TIMEOUT', transportCode: code?.match(/^[A-Z_]+$/)?.[0] ?? error.name };
+    return { code: 'MODEL_TIMEOUT', transportCode: typeof code === 'string' && /^[A-Z_]+$/.test(code) ? code : error.name };
   }
   if (['ECONNRESET', 'ECONNREFUSED', 'EPIPE', 'ENOTFOUND', 'EAI_AGAIN', 'UND_ERR_SOCKET'].includes(code)) {
     return { code: 'MODEL_NETWORK_FAILED', transportCode: code };

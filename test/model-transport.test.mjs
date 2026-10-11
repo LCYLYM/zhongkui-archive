@@ -69,3 +69,16 @@ test('a terminal choice is complete even when DONE is omitted; length remains re
   assert.equal(payload.streamEvents, 1);
   assert.throws(() => parseNimCompletion(parseNimStream(stream('length')), { allowMissingUsage: true }), { code: 'MODEL_OUTPUT_TRUNCATED' });
 });
+
+
+test('native AbortController errors with numeric DOMException codes remain retryable', () => {
+  for (const name of ['AbortError', 'TimeoutError']) {
+    const native = new DOMException('synthetic deadline', name);
+    assert.equal(typeof native.code, 'number');
+    assert.deepEqual(classifyModelTransportError(native), { code: 'MODEL_TIMEOUT', transportCode: name });
+    const wrapped = new TypeError('fetch failed', { cause: native });
+    // Native fetch normally throws the DOMException directly; preserve a wrapped
+    // numeric-code cause without crashing, even if it has no known classification.
+    assert.equal(classifyModelTransportError(wrapped), null);
+  }
+});
