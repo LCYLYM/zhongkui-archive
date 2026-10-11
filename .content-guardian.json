@@ -27,9 +27,10 @@
     "maxPromptBytes": 110000,
     "maxCny": 10,
     "maxWallMinutes": 60,
-    "maxModelMinutes": 30,
-    "maxModelAttempts": 3,
-    "maxChangedFiles": 3
+    "maxModelMinutes": 10,
+    "maxModelAttempts": 5,
+    "maxChangedFiles": 3,
+    "maxModelAttemptSeconds": 100
   },
   "contentPolicy": {
     "videoPrimaryToCrossRatio": 2,

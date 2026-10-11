@@ -4,6 +4,7 @@ import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { requestModelWithRetry } from './model-retry.mjs';
 import { estimateCny } from './content-budget.mjs';
 import { applyVideoAudiencePolicy, canonicalizeUrl, toSiteItem, validateDraftCandidates } from './content-schema.mjs';
 import { buildModelRequest, classifyModelTransportError, classifyNimHttpStatus, parseModelDraftOutput, parseNimCompletion, parseNimStream } from './nim-client.mjs';
@@ -227,9 +228,9 @@ function buildResearchBundle(research, videoContexts) {
   return `${sections.join('\n\n')}\n`;
 }
 
-async function runModel({ config, prompt, credential, searches, startedAt, deadline, spentCny = 0 }) {
+async function runModel({ config, prompt, credential, searches, startedAt, deadline, attemptDeadline, spentCny = 0 }) {
   const controller = new AbortController();
-  const modelDeadline = Math.min(deadline, Date.now() + config.limits.maxModelMinutes * 60_000);
+  const modelDeadline = Math.min(deadline, attemptDeadline);
   const timer = setTimeout(() => controller.abort(), Math.max(1, modelDeadline - Date.now()));
   let responseText = '';
   const promptBytes = Buffer.byteLength(prompt, 'utf8');
@@ -315,7 +316,7 @@ async function runModel({ config, prompt, credential, searches, startedAt, deadl
   } catch (error) {
     const transport = classifyModelTransportError(error);
     if (transport) {
-      throw Object.assign(new GuardianError(Date.now() >= deadline ? 'TIME_LIMIT_EXCEEDED' : transport.code, 'Model API transport failed'), { evidence: { ...baseEvidence, transportCode: transport.transportCode, durationMs: Date.now() - startedAt } });
+      throw Object.assign(new GuardianError(transport.code, 'Model API transport failed'), { evidence: { ...baseEvidence, transportCode: transport.transportCode, durationMs: Date.now() - startedAt } });
     }
     error.evidence ??= { ...baseEvidence, durationMs: Date.now() - startedAt };
     throw error;
@@ -406,28 +407,15 @@ try {
     if (Buffer.byteLength(prompt, 'utf8') > config.limits.maxPromptBytes) {
       throw new GuardianError('RESEARCH_BUNDLE_TOO_LARGE', 'bounded research prompt exceeded the configured limit');
     }
-    let modelResult, spentCny = 0;
-    const failures = [], maxAttempts = Math.min(3, Math.max(1, config.limits.maxModelAttempts ?? 1));
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      console.log(`model attempt=${attempt}/${maxAttempts} searches=${research.searches} stream=${config.model.stream} reasoning_effort=${config.model.reasoningEffort} model=${config.model.id}`);
-      try {
-        modelResult = await runModel({ config, prompt, credential, searches: research.searches, startedAt, deadline, spentCny });
-        modelResult.evidence.estimatedCny = Number((spentCny + modelResult.evidence.estimatedCny).toFixed(6));
-        modelResult.evidence.modelAttempts = attempt;
-        modelResult.evidence.modelFailures = failures;
-        if (failures.length) modelResult.evidence.costBasis = 'completion-plus-retry-upper-bounds';
-        break;
-      } catch (error) {
-        spentCny = Number((spentCny + (error.evidence?.estimatedCny ?? 0)).toFixed(6));
-        failures.push({ attempt, code: error.code ?? 'CONTENT_GUARDIAN_FAILED', httpStatus: error.evidence?.httpStatus ?? null, transportCode: error.evidence?.transportCode ?? null });
-        error.evidence = { ...error.evidence, estimatedCny: spentCny, modelAttempts: attempt, modelFailures: [...failures] };
-        const retryable = ['MODEL_SERVICE_FAILED', 'MODEL_RATE_LIMITED', 'MODEL_TIMEOUT', 'MODEL_NETWORK_FAILED', 'MODEL_STREAM_INCOMPLETE'].includes(error.code);
-        const delayMs = attempt * 10_000;
-        if (!retryable || attempt === maxAttempts || Date.now() + delayMs >= deadline) throw error;
-        console.log(`model retry code=${error.code} http_status=${error.evidence.httpStatus ?? 'none'} delay_ms=${delayMs}`);
-        await new Promise(resolve => setTimeout(resolve, delayMs));
-      }
-    }
+    console.log(`model synthesis searches=${research.searches} stream=${config.model.stream} reasoning_effort=${config.model.reasoningEffort} model=${config.model.id}`);
+    const modelResult = await requestModelWithRetry({
+      limits: config.limits,
+      deadline,
+      request: ({ attemptDeadline, deadline: modelDeadline, spentCny }) => runModel({
+        config, prompt, credential, searches: research.searches, startedAt,
+        deadline: modelDeadline, attemptDeadline, spentCny,
+      }),
+    });
     evidence = modelResult.evidence;
     evidence.researchSha256 = researchBundleSha256;
     if (gitStatus() !== '') throw new GuardianError('SOURCE_CHANGED_DURING_RUN', 'repository changed while the model request was running');
@@ -525,6 +513,7 @@ const report = {
     usage: evidence.usage,
     estimatedCny: evidence.estimatedCny,
     modelAttempts: evidence.modelAttempts,
+    modelRetryDurationMs: evidence.modelRetryDurationMs,
     modelFailures: evidence.modelFailures,
   } : null,
 };

@@ -98,7 +98,7 @@ jobs:
             echo "- 新增：${{ steps.curator.outputs.new_items || '0' }} 条"
             echo "- WebSearch：${{ steps.curator.outputs.searches || '0' }} / 200"
             echo "- 估算费用：${{ steps.curator.outputs.estimated_cny || '0' }} / 10 CNY"
-            echo "- 模型请求：${{ steps.curator.outputs.model_attempts || '0' }} / 3 次"
+            echo "- 模型请求：${{ steps.curator.outputs.model_attempts || '0' }} / 5 次"
             echo "- 阻塞码：${{ steps.curator.outputs.blocker_code || '无' }}"
             echo "- HTTP 状态：${{ steps.curator.outputs.http_status || '无' }}"
             echo '- 原始模型响应、搜索全文和环境变量未上传。'
