@@ -265,6 +265,7 @@ async function runModel({ config, prompt, credential, searches, startedAt, deadl
       signal: controller.signal,
     });
     baseEvidence.httpStatus = response.status;
+    baseEvidence.responseContentType = response.headers.get('content-type')?.split(';')[0]?.slice(0,100) ?? null;
     responseText = await readLimitedText(response, 8_000_000, 'MODEL_PROTOCOL_FAILED');
     Object.assign(baseEvidence, {
       httpStatus: response.status,
@@ -286,7 +287,8 @@ async function runModel({ config, prompt, credential, searches, startedAt, deadl
     }
     let payload;
     try { payload = config.model.stream ? parseNimStream(responseText) : JSON.parse(responseText); }
-    catch { throw new GuardianError('MODEL_PROTOCOL_FAILED', 'Model API returned invalid JSON'); }
+    catch (error) { throw new GuardianError(error.code ?? 'MODEL_PROTOCOL_FAILED', 'Model API response failed validation'); }
+    Object.assign(baseEvidence, { returnedModel: payload.returnedModel, streamEvents: payload.streamEvents, finishReason: payload.choices?.[0]?.finish_reason });
     let completion;
     try { completion = parseNimCompletion(payload, { allowMissingUsage: config.model.stream }); }
     catch (error) { throw new GuardianError(error.code ?? 'MODEL_PROTOCOL_FAILED', error.message); }
@@ -350,6 +352,8 @@ function publicBlocker(error) {
     MODEL_PROTOCOL_FAILED: '模型响应格式异常，未发布本轮内容。',
     MODEL_USAGE_MISSING: '模型响应缺少可核验用量，费用门无法执行，未发布内容。',
     MODEL_OUTPUT_TRUNCATED: '模型输出达到上限，草稿不完整，未发布内容。',
+    MODEL_UPSTREAM_ERROR: '模型接口返回上游错误，未发布内容。',
+    MODEL_STREAM_INCOMPLETE: '模型响应流未完整结束，未发布内容。',
     MODEL_EMPTY_RESPONSE: '模型未返回可用草稿，未发布内容。',
     SOURCE_CHANGED_DURING_RUN: '模型运行期间源码发生变化，本轮补丁已拒绝。',
     RESEARCH_BUNDLE_TOO_LARGE: '压缩后的搜索证据仍超过任务载荷上限，未调用模型。',
@@ -417,7 +421,7 @@ try {
         spentCny = Number((spentCny + (error.evidence?.estimatedCny ?? 0)).toFixed(6));
         failures.push({ attempt, code: error.code ?? 'CONTENT_GUARDIAN_FAILED', httpStatus: error.evidence?.httpStatus ?? null, transportCode: error.evidence?.transportCode ?? null });
         error.evidence = { ...error.evidence, estimatedCny: spentCny, modelAttempts: attempt, modelFailures: [...failures] };
-        const retryable = ['MODEL_SERVICE_FAILED', 'MODEL_RATE_LIMITED', 'MODEL_TIMEOUT', 'MODEL_NETWORK_FAILED'].includes(error.code);
+        const retryable = ['MODEL_SERVICE_FAILED', 'MODEL_RATE_LIMITED', 'MODEL_TIMEOUT', 'MODEL_NETWORK_FAILED', 'MODEL_STREAM_INCOMPLETE'].includes(error.code);
         const delayMs = attempt * 10_000;
         if (!retryable || attempt === maxAttempts || Date.now() + delayMs >= deadline) throw error;
         console.log(`model retry code=${error.code} http_status=${error.evidence.httpStatus ?? 'none'} delay_ms=${delayMs}`);
@@ -506,6 +510,10 @@ const report = {
     transportCode: evidence.transportCode,
     durationMs: evidence.durationMs,
     responseBytes: evidence.responseBytes,
+    responseContentType: evidence.responseContentType,
+    returnedModel: evidence.returnedModel,
+    streamEvents: evidence.streamEvents,
+    finishReason: evidence.finishReason,
     responseSha256: evidence.responseSha256,
     httpStatus: evidence.httpStatus,
     costBasis: evidence.costBasis,
@@ -532,3 +540,8 @@ await setOutputs({
   http_status: evidence?.httpStatus ?? '',
 });
 console.log(`content guardian status=${status} new_items=${newItems} searches=${evidence?.searches ?? 0} estimated_cny=${evidence?.estimatedCny ?? 0} blocker=${blockerCode || 'none'} http_status=${evidence?.httpStatus ?? 'none'}`);
+
+if (!['PASS', 'NOOP'].includes(status)) {
+  console.error(`::error::Content guardian ${status}: ${blockerCode || 'CONTENT_GUARDIAN_FAILED'}`);
+  process.exitCode = 1;
+}

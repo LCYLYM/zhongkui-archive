@@ -32,7 +32,23 @@ export function normalizeNimUsage(usage) {
   };
 }
 
+function rejectUpstreamError(payload) {
+  if (!payload?.error && payload?.type !== 'error') return;
+  const error = payload.error ?? payload;
+  const status = Number(error.status ?? error.status_code ?? payload.status);
+  const tag = String(error.code ?? error.type ?? '').toLowerCase();
+  let code = 'MODEL_UPSTREAM_ERROR';
+  if (Number.isInteger(status) && status >= 400 && status <= 599) code = classifyNimHttpStatus(status);
+  else if (/timeout|timed_out/.test(tag)) code = 'MODEL_TIMEOUT';
+  else if (/rate_limit|quota_exceeded/.test(tag)) code = 'MODEL_RATE_LIMITED';
+  else if (/invalid_api_key|authentication|permission_denied/.test(tag)) code = 'MODEL_AUTH_FAILED';
+  else if (/server_error|service_unavailable|overloaded/.test(tag)) code = 'MODEL_SERVICE_FAILED';
+  else if (/invalid_request|unsupported|invalid_parameter/.test(tag)) code = 'MODEL_REQUEST_REJECTED';
+  throw Object.assign(new Error('Model API returned an upstream error'), { code });
+}
+
 export function parseNimCompletion(payload, options = {}) {
+  rejectUpstreamError(payload);
   const choice = payload?.choices?.[0];
   if (!choice || typeof choice !== 'object') {
     throw Object.assign(new Error('Model API response did not contain a completion choice'), { code: 'MODEL_PROTOCOL_FAILED' });
@@ -59,9 +75,19 @@ export function parseNimCompletion(payload, options = {}) {
 }
 
 export function parseNimStream(text) {
+  const source = String(text ?? '').trim();
+  if (source.startsWith('{')) {
+    let payload;
+    try { payload = JSON.parse(source); }
+    catch { throw Object.assign(new Error('Model API returned invalid JSON'), { code: 'MODEL_PROTOCOL_FAILED' }); }
+    rejectUpstreamError(payload);
+    throw Object.assign(new Error('Model API did not return a completion stream'), { code: 'MODEL_PROTOCOL_FAILED' });
+  }
   const chunks = [];
   let usage = null;
   let finishReason = null;
+  let returnedModel = null;
+  let streamEvents = 0;
   for (const line of String(text ?? '').split(/\r?\n/)) {
     if (!line.startsWith('data:')) continue;
     const data = line.slice(5).trim();
@@ -69,6 +95,9 @@ export function parseNimStream(text) {
     let event;
     try { event = JSON.parse(data); }
     catch { throw Object.assign(new Error('Model API stream contained invalid JSON'), { code: 'MODEL_PROTOCOL_FAILED' }); }
+    rejectUpstreamError(event);
+    streamEvents++;
+    if (typeof event.model === 'string' && /^[a-zA-Z0-9./:_-]{1,128}$/.test(event.model) && !/^sk[-_]/i.test(event.model)) returnedModel = event.model;
     if (event.usage) usage = event.usage;
     const choice = event.choices?.[0];
     if (!choice) continue;
@@ -79,7 +108,13 @@ export function parseNimStream(text) {
       chunks.push(content.filter(block => block?.type === 'text' && typeof block.text === 'string').map(block => block.text).join(''));
     }
   }
+  // A terminal choice is authoritative even when a provider omits [DONE].
+  if (!finishReason) {
+    throw Object.assign(new Error('Model API stream ended without a terminal choice'), { code: 'MODEL_STREAM_INCOMPLETE' });
+  }
   return {
+    returnedModel,
+    streamEvents,
     choices: [{ finish_reason: finishReason, message: { content: chunks.join('') } }],
     usage,
   };
