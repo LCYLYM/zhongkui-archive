@@ -6,12 +6,12 @@
   },
   "model": {
     "provider": "openai-compatible",
-    "id": "qwen3.8-flash",
+    "id": "auto",
     "maxTokens": 16384,
     "stream": true,
     "temperature": 0.2,
     "topP": 0.95,
-    "reasoningEffort": "max"
+    "reasoningEffort": "xhigh"
   },
   "search": {
     "exaMcpUrl": "https://mcp.exa.ai/mcp"

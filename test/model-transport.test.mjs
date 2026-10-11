@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { buildModelRequest, classifyModelTransportError, parseNimCompletion, parseNimStream } from '../scripts/nim-client.mjs';
 
 test('nested fetch timeouts and dropped connections receive retryable classifications', () => {
@@ -10,10 +11,14 @@ test('nested fetch timeouts and dropped connections receive retryable classifica
   assert.equal(classifyModelTransportError(new SyntaxError('bad JSON')), null);
 });
 
-test('configured Qwen effort is transmitted without disabling thinking', () => {
-  const request = buildModelRequest({ id: 'qwen3.8-flash', reasoningEffort: 'max', stream: true, maxTokens: 16384 }, 'evidence');
-  assert.equal(request.reasoning_effort, 'max');
-  assert.equal(request.model, 'qwen3.8-flash');
+test('production auto configuration sends xhigh effort and text evidence only', () => {
+  const config = JSON.parse(readFileSync(new URL('../.content-guardian.json', import.meta.url)));
+  const request = buildModelRequest(config.model, 'evidence');
+  assert.equal(request.reasoning_effort, 'xhigh');
+  assert.equal(request.model, 'auto');
+  assert.equal(request.stream, true);
+  assert.ok(request.messages.every(message => typeof message.content === 'string'));
+  assert.throws(() => buildModelRequest(config.model, [{ type: 'image_url', image_url: { url: 'https://example.com/image.png' } }]), { code: 'MODEL_TEXT_INPUT_REQUIRED' });
   assert.equal(request.chat_template_kwargs, undefined);
   assert.equal(request.messages[1].content, 'evidence');
 });

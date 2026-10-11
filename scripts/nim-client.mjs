@@ -107,6 +107,9 @@ export function classifyModelTransportError(error) {
 }
 
 export function buildModelRequest(model, prompt) {
+  if (typeof prompt !== 'string') {
+    throw Object.assign(new TypeError('Content synthesis accepts text evidence only'), { code: 'MODEL_TEXT_INPUT_REQUIRED' });
+  }
   return {
     model: model.id,
     messages: [

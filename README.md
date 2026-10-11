@@ -8,7 +8,7 @@
 
 仓库每天通过 GitHub Actions 运行一次受限的内容采集：
 
-1. 使用 OpenAI 兼容接口的 `qwen3.8-flash` 处理资料，发送 `reasoning_effort: "max"`，使用流式响应。接口地址与密钥分别配置在 Actions Secrets 的 `MODEL_BASE_URL`（含 `/v1`）和 `MODEL_API_KEY`。
+1. 使用 OpenAI 兼容接口的 `auto` 处理资料，发送 `reasoning_effort: "xhigh"`，使用流式响应。仅发送搜索结果、公开元数据与可获取字幕的文本，不调用视觉模型或发送图像、视频输入。接口地址与密钥分别配置在 Actions Secrets 的 `MODEL_BASE_URL`（含 `/v1`）和 `MODEL_API_KEY`。
 2. 由脚本直接调用 Exa 的匿名免费 MCP，按固定查询计划搜索近期一手消息与高价值解读；搜索不依赖模型自行触发。
 3. 当前每轮固定执行 16 次跨来源搜索，硬上限 200 次，只选择最多 10 条新资料。
 4. 对检出的 B站、YouTube 视频尝试读取公开元数据与字幕：只有接口确实返回字幕正文时才交给模型；登录限制、YouTube PO Token 限制和未提供字幕都会明确标记，不能被写成“已提取字幕”。
