@@ -4,12 +4,13 @@ import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { validateModelDraftOutput } from './model-draft.mjs';
 import { modelTimeout } from './model-timeout.mjs';
 import { requestSearchWithRetry, retryAfterMs } from './search-retry.mjs';
 import { requestModelWithRetry } from './model-retry.mjs';
 import { estimateCny } from './content-budget.mjs';
-import { applyVideoAudiencePolicy, canonicalizeUrl, toSiteItem, validateDraftCandidates } from './content-schema.mjs';
-import { buildModelRequest, classifyModelTransportError, classifyNimHttpStatus, parseModelDraftOutput, parseNimCompletion, parseNimStream } from './nim-client.mjs';
+import { applyVideoAudiencePolicy, canonicalizeUrl, toSiteItem } from './content-schema.mjs';
+import { buildModelRequest, classifyModelTransportError, classifyNimHttpStatus, parseNimCompletion, parseNimStream } from './nim-client.mjs';
 import { collectVideoContexts } from './video-context.mjs';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -439,26 +440,18 @@ try {
           config, prompt, credential, searches: research.searches, searchRequests: research.searchRequests, startedAt,
           deadline: modelDeadline, idleTimeoutMs, spentCny,
         });
-        try { result.rawDraft = parseModelDraftOutput(result.output); }
-        catch { throw Object.assign(new GuardianError('DRAFT_OUTPUT_INVALID', 'Model final text is not a valid JSON draft'), { evidence: result.evidence }); }
+        try {
+          const validated = validateModelDraftOutput(result.output, { runDate, maxItems: config.limits.maxNewItems });
+          result.draft = validated.draft;
+          result.evidence.discardedItems = validated.discardedItems;
+        } catch (error) { throw Object.assign(error, { evidence: result.evidence }); }
         return result;
       },
     });
     evidence = modelResult.evidence;
     evidence.researchSha256 = researchBundleSha256;
     if (gitStatus() !== '') throw new GuardianError('SOURCE_CHANGED_DURING_RUN', 'repository changed while the model request was running');
-    const rawDraft = modelResult.rawDraft;
-    let draft;
-    try {
-      const result = validateDraftCandidates(rawDraft, { maxItems: config.limits.maxNewItems });
-      draft = result.draft;
-      evidence.discardedItems = result.discardedItems;
-    } catch (error) {
-      throw Object.assign(new GuardianError('DRAFT_SCHEMA_INVALID', error.message), { evidence });
-    }
-    if (draft.runDate !== runDate) {
-      throw Object.assign(new GuardianError('DRAFT_SCHEMA_INVALID', 'draft runDate does not match this run'), { evidence });
-    }
+    const draft = modelResult.draft;
     const seen = new Set(state.seenUrls.map(url => canonicalizeUrl(url)));
     const rankedPublishable = draft.items
       .filter(item => item.reviewFlags.length === 0 && item.evidenceLevel !== 'speculation')

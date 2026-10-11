@@ -89,7 +89,7 @@ test('an active slow stream may finish after 100 seconds within the shared deadl
 
 
 test('truncated or malformed model output can recover without accepting the failed draft', async () => {
-  for (const code of ['MODEL_OUTPUT_TRUNCATED', 'DRAFT_OUTPUT_INVALID']) {
+  for (const code of ['MODEL_OUTPUT_TRUNCATED', 'DRAFT_OUTPUT_INVALID', 'DRAFT_SCHEMA_INVALID']) {
     const timer = clock();
     const answer = await requestModelWithRetry({ ...timer, limits, deadline: 600_000, request: async ({ attempt }) => {
       if (attempt === 1) throw failure(code);

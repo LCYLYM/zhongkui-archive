@@ -1,7 +1,7 @@
 const retryableCodes = new Set([
   'MODEL_SERVICE_FAILED', 'MODEL_RATE_LIMITED', 'MODEL_TIMEOUT', 'MODEL_NETWORK_FAILED',
   'MODEL_STREAM_INCOMPLETE', 'MODEL_EMPTY_RESPONSE', 'MODEL_PROTOCOL_FAILED',
-  'MODEL_OUTPUT_TRUNCATED', 'DRAFT_OUTPUT_INVALID',
+  'MODEL_OUTPUT_TRUNCATED', 'DRAFT_OUTPUT_INVALID', 'DRAFT_SCHEMA_INVALID',
 ]);
 
 // One shared deadline includes requests and backoff; the caller enforces each
@@ -32,7 +32,7 @@ export async function requestModelWithRetry({ request, limits, deadline, now = D
       return result;
     } catch (error) {
       spentCny = Number((spentCny + (error.evidence?.estimatedCny ?? 0)).toFixed(6));
-      failures.push({ attempt, code: error.code ?? 'CONTENT_GUARDIAN_FAILED', httpStatus: error.evidence?.httpStatus ?? null, transportCode: error.evidence?.transportCode ?? null });
+      failures.push({ attempt, code: error.code ?? 'CONTENT_GUARDIAN_FAILED', httpStatus: error.evidence?.httpStatus ?? null, transportCode: error.evidence?.transportCode ?? null, validationFailure: error.validationFailure ?? null });
       error.evidence = { ...error.evidence, estimatedCny: spentCny, modelAttempts: attempt, modelFailures: [...failures], modelRetryDurationMs: now() - startedAt };
       const delayMs = Math.min(40_000, 5000 * 2 ** (attempt - 1));
       if (!retryableCodes.has(error.code) || attempt === maxAttempts || now() + delayMs >= retryDeadline) throw error;
