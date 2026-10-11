@@ -4,6 +4,7 @@ import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { requestSearchWithRetry, retryAfterMs } from './search-retry.mjs';
 import { requestModelWithRetry } from './model-retry.mjs';
 import { estimateCny } from './content-budget.mjs';
 import { applyVideoAudiencePolicy, canonicalizeUrl, toSiteItem, validateDraftCandidates } from './content-schema.mjs';
@@ -176,6 +177,7 @@ async function callExa(config, query, deadline, requestId) {
       signal: controller.signal,
     });
     evidence.httpStatus = response.status;
+    evidence.retryAfterMs = retryAfterMs(response.headers.get('retry-after'));
     if (!response.ok) throw new GuardianError('EXA_SEARCH_FAILED', 'Exa HTTP request failed');
     const payload = parseMcpPayload(await readLimitedText(response));
     if (payload.error || payload.result?.isError) {
@@ -204,15 +206,30 @@ async function collectExaResearch({ config, sources, deadline }) {
     throw new GuardianError('SEARCH_PLAN_INVALID', 'configured query count is outside the search limits');
   }
   const results = [];
+  let searchRequests = 0;
   for (const [index, query] of normalizedQueries.entries()) {
     if (Date.now() >= deadline) throw new GuardianError('TIME_LIMIT_EXCEEDED', 'content research reached its overall deadline');
-    const response = await callExa(config, query, deadline, index + 1);
+    if (index > 0) await new Promise(resolve => setTimeout(resolve, 1000));
+    let response;
+    try {
+      response = await requestSearchWithRetry({
+        deadline,
+        request: () => {
+          if (Date.now() >= deadline) throw new GuardianError('TIME_LIMIT_EXCEEDED', 'content research reached its overall deadline');
+          if (searchRequests >= config.limits.maxSearches) throw new GuardianError('SEARCH_LIMIT_EXCEEDED', 'search retries reached the request limit');
+          return callExa(config, query, deadline, ++searchRequests);
+        },
+      });
+    } catch (error) {
+      error.evidence = { ...error.evidence, searches: results.length, searchRequests };
+      throw error;
+    }
     const text = flattenExternalText(response).join('\n').replace(/\u0000/g, '').trim();
-    if (text.length < 40) throw Object.assign(new GuardianError('EXA_SEARCH_FAILED', 'an Exa search returned no usable evidence'), { evidence: { phase: 'search', searchIndex: index + 1, searches: results.length, searchFailure: 'EMPTY_EVIDENCE', estimatedCny: 0 } });
+    if (text.length < 40) throw Object.assign(new GuardianError('EXA_SEARCH_FAILED', 'an Exa search returned no usable evidence'), { evidence: { phase: 'search', searchIndex: index + 1, searches: results.length, searchRequests, searchFailure: 'EMPTY_EVIDENCE', estimatedCny: 0 } });
     results.push({ query, evidence: text.slice(0, config.limits.maxEvidenceCharsPerSearch) });
     console.log(`research completed=${results.length}/${normalizedQueries.length}`);
   }
-  return { searches: results.length, sha256: sha256(JSON.stringify(results)), results };
+  return { searches: results.length, searchRequests, sha256: sha256(JSON.stringify(results)), results };
 }
 
 function buildResearchBundle(research, videoContexts) {
@@ -228,7 +245,7 @@ function buildResearchBundle(research, videoContexts) {
   return `${sections.join('\n\n')}\n`;
 }
 
-async function runModel({ config, prompt, credential, searches, startedAt, deadline, attemptDeadline, spentCny = 0 }) {
+async function runModel({ config, prompt, credential, searches, searchRequests, startedAt, deadline, attemptDeadline, spentCny = 0 }) {
   const controller = new AbortController();
   const modelDeadline = Math.min(deadline, attemptDeadline);
   const timer = setTimeout(() => controller.abort(), Math.max(1, modelDeadline - Date.now()));
@@ -246,6 +263,7 @@ async function runModel({ config, prompt, credential, searches, startedAt, deadl
     provider: config.model.provider,
     model: config.model.id,
     searches,
+    searchRequests,
     usage: null,
     estimatedCny: boundedCny,
     costBasis: 'configured-upper-bound',
@@ -412,7 +430,7 @@ try {
       limits: config.limits,
       deadline,
       request: ({ attemptDeadline, deadline: modelDeadline, spentCny }) => runModel({
-        config, prompt, credential, searches: research.searches, startedAt,
+        config, prompt, credential, searches: research.searches, searchRequests: research.searchRequests, startedAt,
         deadline: modelDeadline, attemptDeadline, spentCny,
       }),
     });
@@ -510,6 +528,7 @@ const report = {
     trimmedCrossAudience: evidence.trimmedCrossAudience,
     researchSha256: evidence.researchSha256,
     searches: evidence.searches,
+    searchRequests: evidence.searchRequests,
     usage: evidence.usage,
     estimatedCny: evidence.estimatedCny,
     modelAttempts: evidence.modelAttempts,
@@ -522,7 +541,7 @@ await setOutputs({
   status,
   new_items: newItems,
   input_fingerprint: inputFingerprint,
-  searches: evidence?.searches ?? 0,
+  searches: evidence?.searchRequests ?? evidence?.searches ?? 0,
   estimated_cny: evidence?.estimatedCny ?? 0,
   model_attempts: evidence?.modelAttempts ?? 0,
   blocker_code: blockerCode,
