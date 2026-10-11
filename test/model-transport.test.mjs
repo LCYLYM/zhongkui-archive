@@ -77,8 +77,6 @@ test('native AbortController errors with numeric DOMException codes remain retry
     assert.equal(typeof native.code, 'number');
     assert.deepEqual(classifyModelTransportError(native), { code: 'MODEL_TIMEOUT', transportCode: name });
     const wrapped = new TypeError('fetch failed', { cause: native });
-    // Native fetch normally throws the DOMException directly; preserve a wrapped
-    // numeric-code cause without crashing, even if it has no known classification.
-    assert.equal(classifyModelTransportError(wrapped), null);
+    assert.deepEqual(classifyModelTransportError(wrapped), { code: 'MODEL_TIMEOUT', transportCode: name });
   }
 });
