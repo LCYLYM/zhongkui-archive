@@ -11,10 +11,10 @@ test('nested fetch timeouts and dropped connections receive retryable classifica
   assert.equal(classifyModelTransportError(new SyntaxError('bad JSON')), null);
 });
 
-test('production auto configuration sends xhigh effort and text evidence only', () => {
+test('production auto configuration sends high effort and text evidence only', () => {
   const config = JSON.parse(readFileSync(new URL('../.content-guardian.json', import.meta.url)));
   const request = buildModelRequest(config.model, 'evidence');
-  assert.equal(request.reasoning_effort, 'xhigh');
+  assert.equal(request.reasoning_effort, 'high');
   assert.equal(request.model, 'auto');
   assert.equal(request.stream, true);
   assert.ok(request.messages.every(message => typeof message.content === 'string'));

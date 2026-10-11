@@ -11,7 +11,7 @@
     "stream": true,
     "temperature": 0.2,
     "topP": 0.95,
-    "reasoningEffort": "xhigh"
+    "reasoningEffort": "high"
   },
   "search": {
     "exaMcpUrl": "https://mcp.exa.ai/mcp"
