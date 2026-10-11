@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "runDate": "2026-10-12",
+  "generatedAt": "2026-10-11T17:13:49.597Z",
+  "items": [
+    {
+      "id": "auto-6c8afdc806b736",
+      "type": "analysis",
+      "date": "2026.08.21",
+      "time": "08:00",
+      "source": "blackmyth.game 编辑部",
+      "platform": "文章",
+      "platformEn": "ARTICLE",
+      "title": "15 分钟实机演示战斗层逐帧拆解：武器切换、HUD 与火雷元素",
+      "titleEn": "Frame-by-Frame Combat Layer of the 15-Minute Demo: Weapon Switching, HUD, and Fire/Lightning",
+      "summary": "编辑部按 0.25 秒窗口逐帧记录 8·20 官方实机演示中的战斗层证据：白衣剑客在 t≈157.5 拔剑近战，t≈165 起 HUD 首次出现（葫芦圆标、白蓝黄资源条、右下四槽加金环），t≈551 后同一角色握长棍进入大蚌真君 Boss 战。火入刃分 t≈350–365 与 t≈362.5–364.25 两段，雷电交击集中于 t≈748–762。文章明确标注弹反、闪避消耗、部位破坏等机制均未获官方确认，仅描述画面可见部分。",
+      "summaryEn": "Editorial frame-by-frame combat evidence from the 8/20 demo: sword melee at t≈157.5, HUD first visible at t≈165 (gourd icon, white/blue/yellow resource bars, four bottom-right slots plus gold ring), staff-armed boss fight from t≈551. Fire-imbue split into two windows (t≈350–365, t≈362.5–364.25); lightning exchange t≈748–762. Parry, dodge cost, and part-destroy are explicitly flagged as unconfirmed by the developer; only visible frames are described.",
+      "audience": [
+        "zh"
+      ],
+      "evidence": "analysis",
+      "duration": "文章",
+      "durationEn": "article",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "钟馗",
+        "战斗系统",
+        "HUD",
+        "火雷元素",
+        "逐帧分析",
+        "大蚌真君"
+      ],
+      "tagsEn": [
+        "Zhong Kui",
+        "combat",
+        "HUD",
+        "fire lightning",
+        "frame analysis",
+        "Da Bang Zhen Jun"
+      ],
+      "links": [
+        {
+          "label": "阅读原文",
+          "labelEn": "Read source",
+          "url": "https://blackmyth.game/zh-cn/posts/analysis/black-myth-zhong-kui-combat-mechanics/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://blackmyth.game/zh-cn/posts/analysis/black-myth-zhong-kui-combat-mechanics/",
+        "originalTitle": "《黑神话：钟馗》实机战斗：画面里有什么",
+        "publishedAt": "2026-08-21T00:00:00.000Z",
+        "collectedAt": "2026-10-11T17:13:49.597Z",
+        "valueScore": 85,
+        "evidence": [
+          {
+            "url": "https://blackmyth.game/zh-cn/posts/analysis/black-myth-zhong-kui-combat-mechanics/",
+            "type": "secondary",
+            "supports": "编辑部基于官方 8·20 实机演示视频（B 站 BV1kS8H6VERt / YouTube oi2QgPH61JM）的逐帧观察与 HUD 文字记录",
+            "supportsEn": "Editorial frame-level observation of the official 8/20 gameplay demo (Bilibili BV1kS8H6VERt / YouTube oi2QgPH61JM)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-2684d4081256b3",
+      "type": "research",
+      "date": "2026.04.27",
+      "time": "08:00",
+      "source": "blackmyth.game Editorial Desk",
+      "platform": "文章",
+      "platformEn": "ARTICLE",
+      "title": "日本修奇（Shoki）：钟馗东传的跨文化消歧与民俗流变",
+      "titleEn": "Shoki in Japan: Cross-Cultural Disambiguation of Zhong Kui's Eastward Transmission",
+      "summary": "针对海外玩家常先遇日本名 Shoki 再回查中文钟馗的混淆路径，本文对比中日两侧名号、核心职能、屋顶守护、儿童健康与绘画传统。结论：Shoki 是钟馗经日语发音本地化的分支，非独立怪物，也不构成对《黑神话：钟馗》游戏内容的任何确认。",
+      "summaryEn": "For global players who encounter Shoki before reading about Zhong Kui, this piece compares Chinese and Japanese name forms, core functions, rooftop guardianship, child-health rituals, and painting traditions. Bottom line: Shoki is a phonetic localization branch of Zhong Kui, not a separate entity, and it confirms no game content.",
+      "audience": [
+        "en"
+      ],
+      "evidence": "analysis",
+      "duration": "文章",
+      "durationEn": "article",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "钟馗",
+        "修奇",
+        "日本民俗",
+        "跨文化",
+        "门神",
+        "驱鬼"
+      ],
+      "tagsEn": [
+        "Zhong Kui",
+        "Shoki",
+        "Japanese folklore",
+        "cross-cultural",
+        "door god",
+        "demon quelling"
+      ],
+      "links": [
+        {
+          "label": "阅读原文",
+          "labelEn": "Read source",
+          "url": "https://blackmyth.game/en/posts/lore/zhong-kui-japan-shoki/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://blackmyth.game/en/posts/lore/zhong-kui-japan-shoki/",
+        "originalTitle": "Shoki the Demon Queller: Zhong Kui in Japan",
+        "publishedAt": "2026-04-27T00:00:00.000Z",
+        "collectedAt": "2026-10-11T17:13:49.597Z",
+        "valueScore": 72,
+        "evidence": [
+          {
+            "url": "https://blackmyth.game/en/posts/lore/zhong-kui-japan-shoki/",
+            "type": "secondary",
+            "supports": "编辑部对钟馗东传日本后民俗学变体的系统梳理，含中日对照表",
+            "supportsEn": "Editorial folklore survey of Zhong Kui's Japanese variant with a side-by-side CN/JP comparison table"
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-52ae782c61568e",
+      "type": "research",
+      "date": "2025.10.12",
+      "time": "01:09",
+      "source": "Raconteur - Mythology & History",
+      "platform": "YOUTUBE",
+      "platformEn": "YOUTUBE",
+      "title": "钟馗：鬼王之悲——从科举落第到阴司司职的神话叙事",
+      "titleEn": "The Tragic Rise of Zhong Kui, King of Ghosts: From Failed Examinee to Underworld Official",
+      "summary": "Raconteur 频道以叙事方式讲述钟馗神话的经典版本：才华出众但相貌粗鄙的进士，在殿试觐见时因外貌被皇帝拒录，愤而撞阶自尽；死后其魂魄入阴司，阎罗王见其才气，封为鬼王，统领阴兵驱鬼护民。视频聚焦神话叙事本身，不涉及游戏内容。",
+      "summaryEn": "Raconteur narrates the classic Zhong Kui myth: a talented but coarse-featured scholar is rejected by the emperor on the day of investiture, slams his head on the palace steps in despair, and dies. His spirit enters the underworld courts, where the King of Hell, recognizing his inner fire, appoints him King of Ghosts to command legions against restless shades. The video covers the myth itself, not game content.",
+      "audience": [
+        "en"
+      ],
+      "evidence": "analysis",
+      "duration": "视频",
+      "durationEn": "video",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "钟馗",
+        "神话",
+        "鬼王",
+        "科举",
+        "阴司",
+        "民俗"
+      ],
+      "tagsEn": [
+        "Zhong Kui",
+        "mythology",
+        "King of Ghosts",
+        "imperial exam",
+        "underworld",
+        "folklore"
+      ],
+      "links": [
+        {
+          "label": "观看原片",
+          "labelEn": "Watch source",
+          "url": "https://www.youtube.com/watch?v=IQ6IwC4L-ug"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://www.youtube.com/watch?v=IQ6IwC4L-ug",
+        "originalTitle": "The Tragic Rise of Zhong Kui, King of Ghosts",
+        "publishedAt": "2025-10-11T17:09:27.416Z",
+        "collectedAt": "2026-10-11T17:13:49.597Z",
+        "valueScore": 60,
+        "evidence": [
+          {
+            "url": "https://www.youtube.com/watch?v=IQ6IwC4L-ug",
+            "type": "secondary",
+            "supports": "Raconteur 频道对钟馗经典神话叙事（科举、撞阶、阎王封鬼王）的讲述",
+            "supportsEn": "Raconteur channel's narrative account of the classic Zhong Kui myth (exam failure, head-slamming, appointment by the King of Hell)"
+          }
+        ]
+      }
+    }
+  ]
+}
