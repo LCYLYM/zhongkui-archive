@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "runDate": "2026-10-12",
+  "generatedAt": "2026-10-12T06:03:25.495Z",
+  "items": [
+    {
+      "id": "auto-c93c7860abe246",
+      "type": "overseas",
+      "date": "2026.09.12",
+      "time": "13:59",
+      "source": "Moist Charlie Clips",
+      "platform": "YOUTUBE",
+      "platformEn": "YOUTUBE",
+      "title": "Charlie（Moist Cr1TiKAL）观看《黑神话：钟馗》实机演示的即时反应",
+      "titleEn": "Charlie (Moist Cr1TiKAL) Reacts to Black Myth: Zhong Kui Gameplay Footage",
+      "summary": "YouTuber Charlie（频道 Moist Cr1TiKAL）在视频中逐段观看《黑神话：钟馗》实机演示并即时反应。据视频字幕片段，他将本作与《黑神话：悟空》及《Mortal Shell 2》对比，认为钟馗的战斗节奏比悟空更新鲜、线性关卡设计优于开放世界结构；他还注意到水下 BOSS 战与主角外观等细节。该视频为个人创作者反应，所有评价仅代表 Charlie 个人观点，不构成官方结论。",
+      "summaryEn": "YouTuber Charlie (Moist Cr1TiKAL channel) reacts segment-by-segment to Black Myth: Zhong Kui gameplay. Based on the video's transcript excerpts, he compares the title to Wukong and Mortal Shell 2, stating the combat feels fresher and that linear pacing beats an open-world structure. He also comments on the underwater boss fight and the protagonist's visual design. This is a personal creator reaction; all opinions are Charlie's own and do not reflect any official Games Science position.",
+      "audience": [
+        "en"
+      ],
+      "evidence": "reaction",
+      "duration": "视频",
+      "durationEn": "video",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "黑神话钟馗",
+        "玩家反应",
+        "海外创作者",
+        "Mortal Shell 2"
+      ],
+      "tagsEn": [
+        "Black Myth Zhong Kui",
+        "reaction",
+        "Moist Cr1TiKAL",
+        "Mortal Shell 2",
+        "gameplay"
+      ],
+      "links": [
+        {
+          "label": "观看原片",
+          "labelEn": "Watch source",
+          "url": "https://www.youtube.com/watch?v=g9lJ-9Gf800"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://www.youtube.com/watch?v=g9lJ-9Gf800",
+        "originalTitle": "Charlie Reacts To Black Myth: Zhong Kui - MoistCr1TiKaL",
+        "publishedAt": "2026-09-12T05:59:14.000Z",
+        "collectedAt": "2026-10-12T06:03:25.495Z",
+        "valueScore": 52,
+        "evidence": [
+          {
+            "url": "https://www.youtube.com/watch?v=g9lJ-9Gf800",
+            "type": "secondary",
+            "supports": "视频画面与字幕片段显示 Charlie 逐段观看并评论《黑神话：钟馗》实机演示，与悟空及 Mortal Shell 2 对比",
+            "supportsEn": "Video and transcript excerpts show Charlie watching and commenting on the Zhong Kui gameplay demo, comparing it to Wukong and Mortal Shell 2"
+          }
+        ]
+      }
+    }
+  ]
+}
