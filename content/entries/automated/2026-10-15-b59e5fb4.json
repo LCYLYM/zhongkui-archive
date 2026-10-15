@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "runDate": "2026-10-15",
+  "generatedAt": "2026-10-15T04:45:58.348Z",
+  "items": [
+    {
+      "id": "auto-00e108087c0ff7",
+      "type": "research",
+      "date": "2025.08.20",
+      "time": "08:00",
+      "source": "文化遗产搬运委员会",
+      "platform": "BILIBILI",
+      "platformEn": "BILIBILI",
+      "title": "《黑神话：钟馗》解析：中国捉鬼大神钟馗的前世今生",
+      "titleEn": "Black Myth: Zhong Kui analysis: the past and present of Chinese ghost-quelling deity Zhong Kui",
+      "summary": "B站UP主文化遗产搬运委员会结合《黑神话：钟馗》新PV，介绍钟馗在中国民俗中的捉鬼大神、门神与地府判官等形象。内容为创作者解读，非游戏科学官方设定。",
+      "summaryEn": "Bilibili creator 文化遗产搬运委员会 uses the new Black Myth: Zhong Kui PV to introduce Zhong Kui's folk roles as a ghost-queller, door god, and underworld judge. This is creator commentary, not official Game Science lore.",
+      "audience": [
+        "zh"
+      ],
+      "evidence": "analysis",
+      "duration": "视频（时长未提供）",
+      "durationEn": "video (duration not provided)",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "钟馗",
+        "门神",
+        "判官",
+        "民俗考据",
+        "B站解读",
+        "人物"
+      ],
+      "tagsEn": [
+        "Zhong Kui",
+        "door god",
+        "judge",
+        "folklore",
+        "Bilibili analysis",
+        "character"
+      ],
+      "links": [
+        {
+          "label": "查看原视频",
+          "labelEn": "Watch source",
+          "url": "https://www.bilibili.com/video/BV18HegzmE6f/"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://www.bilibili.com/video/BV18HegzmE6f/",
+        "originalTitle": "真神炸场!《黑神话:钟馗》解析,中国捉鬼大神的前世今生!_黑神话悟空",
+        "publishedAt": "2025-08-20T00:00:00.000Z",
+        "collectedAt": "2026-10-15T04:45:58.348Z",
+        "valueScore": 85,
+        "evidence": [
+          {
+            "url": "https://www.bilibili.com/video/BV18HegzmE6f/",
+            "type": "secondary",
+            "supports": "该视频的标题、作者与简介支持本条目的作者归属和主题描述。",
+            "supportsEn": "The video title, author, and description support the attribution and topic described in this item."
+          }
+        ]
+      }
+    },
+    {
+      "id": "auto-47f0308c622138",
+      "type": "analysis",
+      "date": "2025.10.15",
+      "time": "08:00",
+      "source": "Gwynblade",
+      "platform": "YOUTUBE",
+      "platformEn": "YOUTUBE",
+      "title": "《黑神话：钟馗》是什么？你需要了解的内容",
+      "titleEn": "What Is Black Myth: Zhong Kui? Everything You Need To ...",
+      "summary": "YouTube创作者Gwynblade介绍《黑神话：钟馗》在gamescom 2025公布，讨论钟馗作为捉鬼之王的背景，并引用官网FAQ说明游戏为单机ARPG、沿用黑神话系列商业模式。内容为创作者解读，非官方结论。",
+      "summaryEn": "YouTube creator Gwynblade introduces Black Myth: Zhong Kui after its Gamescom 2025 reveal, discusses Zhong Kui as a king of ghosts, and cites the official FAQ that the game is a single-player ARPG following the Black Myth business model. This is creator commentary, not an official conclusion.",
+      "audience": [
+        "en"
+      ],
+      "evidence": "analysis",
+      "duration": "视频（时长未提供）",
+      "durationEn": "video (duration not provided)",
+      "image": "/assets/media/official-2026.jpg",
+      "tags": [
+        "钟馗",
+        "黑神话",
+        "游戏科学",
+        "人物介绍",
+        "YouTube解读",
+        "海外分析"
+      ],
+      "tagsEn": [
+        "Zhong Kui",
+        "Black Myth",
+        "Game Science",
+        "character intro",
+        "YouTube analysis",
+        "overseas"
+      ],
+      "links": [
+        {
+          "label": "观看原片",
+          "labelEn": "Watch source",
+          "url": "https://www.youtube.com/watch?v=JeUqYfd53lc"
+        }
+      ],
+      "provenance": {
+        "canonicalUrl": "https://www.youtube.com/watch?v=JeUqYfd53lc",
+        "originalTitle": "What Is Black Myth: Zhong Kui? Everything You Need To ...",
+        "publishedAt": "2025-10-15T00:00:00.000Z",
+        "collectedAt": "2026-10-15T04:45:58.348Z",
+        "valueScore": 75,
+        "evidence": [
+          {
+            "url": "https://www.youtube.com/watch?v=JeUqYfd53lc",
+            "type": "secondary",
+            "supports": "该视频的标题、作者与公开摘要支持本条目的作者归属和主题描述。",
+            "supportsEn": "The video title, author, and public summary support the attribution and topic described in this item."
+          }
+        ]
+      }
+    }
+  ]
+}
