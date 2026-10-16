@@ -390,6 +390,61 @@
     }
   },
   {
+    "id": "auto-c6a212ca158538",
+    "type": "analysis",
+    "date": "2026.08.20",
+    "time": "16:13",
+    "source": "智能路障",
+    "platform": "BILIBILI",
+    "platformEn": "BILIBILI",
+    "title": "黑神话：钟馗 15 分钟实机演示逐段深度解读",
+    "titleEn": "Black Myth: Zhong Kui 15-Minute Gameplay Demo – Segment-by-Segment Analysis",
+    "summary": "智能路障对游戏科学 2026-08-20 发布的 15 分钟实机演示进行逐段拆解，涵盖战斗系统、画面细节与开发节奏判断。视频标题带有较强主观评价色彩，内容属个人解读，不代表官方立场。",
+    "summaryEn": "智能路障's segment-by-segment analysis of the 15-minute gameplay demo released by Game Science on 2026-08-20, covering combat systems, visual details, and development pace. The title contains strong subjective praise; content is personal interpretation, not an official statement.",
+    "audience": [
+      "zh"
+    ],
+    "evidence": "analysis",
+    "duration": "视频",
+    "durationEn": "video",
+    "image": "/assets/media/official-2026.jpg",
+    "tags": [
+      "黑神话钟馗",
+      "实机演示",
+      "战斗系统",
+      "逐段分析",
+      "游戏科学"
+    ],
+    "tagsEn": [
+      "Black Myth Zhong Kui",
+      "gameplay demo",
+      "combat analysis",
+      "breakdown"
+    ],
+    "links": [
+      {
+        "label": "查看原视频",
+        "labelEn": "Watch source",
+        "url": "https://www.bilibili.com/video/BV1Vxbf6aE9H/"
+      }
+    ],
+    "provenance": {
+      "canonicalUrl": "https://www.bilibili.com/video/BV1Vxbf6aE9H/",
+      "originalTitle": "《黑神话：钟馗》实机终极深扒，游科成为世界第一ARPG开发商的底气！【游戏之外】",
+      "publishedAt": "2026-08-20T08:13:08.000Z",
+      "collectedAt": "2026-10-16T04:36:38.033Z",
+      "valueScore": 72,
+      "evidence": [
+        {
+          "url": "https://www.bilibili.com/video/BV1kS8H6VERt/",
+          "type": "official",
+          "supports": "官方 15 分钟实机演示原片，为本视频分析提供画面基础",
+          "supportsEn": "Official 15-minute gameplay demo providing the footage being analyzed"
+        }
+      ]
+    }
+  },
+  {
     "id": "auto-e4869caf3b94d0",
     "type": "research",
     "date": "2026.08.20",
@@ -1234,6 +1289,62 @@
           "type": "secondary",
           "supports": "该视频的标题、作者与简介支持本条目的作者归属和主题描述。",
           "supportsEn": "The video title, author, and description support the attribution and topic described in this item."
+        }
+      ]
+    }
+  },
+  {
+    "id": "auto-550417089d3dca",
+    "type": "official",
+    "date": "2025.08.20",
+    "time": "04:40",
+    "source": "游民星空官方",
+    "platform": "BILIBILI",
+    "platformEn": "BILIBILI",
+    "title": "游民星空：科隆 2025 开幕式《黑神话：钟馗》正式公开报道",
+    "titleEn": "GamerSky: Black Myth: Zhong Kui Officially Revealed at gamescom 2025 Opening Night",
+    "summary": "游民星空在 2025 年科隆展开幕夜后发布，记录《黑神话：钟馗》首次公开（先导预告）的新闻，含官方 6 分钟实机短片与先导预告转载及简要说明。作为项目时间线起点，供查阅首曝时的官方口径。",
+    "summaryEn": "GamerSky's news coverage of the Black Myth: Zhong Kui reveal at gamescom 2025 Opening Night Live. Includes the official 6-minute in-engine teaser and first-look trailer with brief context. Useful as a timeline reference for the project's initial public announcement.",
+    "audience": [
+      "zh"
+    ],
+    "evidence": "confirmed",
+    "duration": "视频",
+    "durationEn": "video",
+    "image": "/assets/media/official-2026.jpg",
+    "tags": [
+      "黑神话钟馗",
+      "科隆2025",
+      "首曝",
+      "官方预告",
+      "游戏科学"
+    ],
+    "tagsEn": [
+      "Black Myth Zhong Kui",
+      "gamescom 2025",
+      "first reveal",
+      "official trailer",
+      "Game Science"
+    ],
+    "links": [
+      {
+        "label": "查看原视频",
+        "labelEn": "Watch source",
+        "url": "https://www.bilibili.com/video/BV1tjeKzvEX4/"
+      }
+    ],
+    "provenance": {
+      "canonicalUrl": "https://www.bilibili.com/video/BV1tjeKzvEX4/",
+      "originalTitle": "游戏科学新作！《黑神话：钟馗》正式公开！",
+      "publishedAt": "2025-08-19T20:40:19.000Z",
+      "collectedAt": "2026-10-16T04:36:38.033Z",
+      "valueScore": 42,
+      "evidence": [
+        {
+          "url": "https://gamesci.cn/zhongkui/",
+          "type": "official",
+          "supports": "官网确认项目存在及科隆 2025 首曝时间线",
+          "supportsEn": "Official site confirms project existence and gamescom 2025 reveal timeline"
         }
       ]
     }
